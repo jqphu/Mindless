@@ -8,7 +8,8 @@ mod routes;
 
 fn main() {
     rocket::ignite()
-        .mount("/", routes![routes::index])
+        .mount("/", routes![routes::index, routes::favicon])
+        .register(catchers![routes::not_found])
         .launch()
         .expect("Successful launch.");
 }
