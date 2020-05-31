@@ -1,1 +1,4 @@
 /target/
+
+# Don't commit the actual database.
+habits.db
