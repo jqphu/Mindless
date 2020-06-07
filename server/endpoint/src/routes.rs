@@ -4,6 +4,8 @@ use rocket::{http::RawStr, response::NamedFile, Request, State};
 use sqlx::SqlitePool;
 use std::io::Cursor;
 
+use crate::database;
+
 /// Simple wrapping type to implement the Responder trait on.
 ///
 pub struct ResponseError(anyhow::Error);
@@ -24,6 +26,9 @@ impl<'r> Responder<'r> for ResponseError {
             request,
             self.0.backtrace()
         );
+
+        // Print the error to the console too.
+        println!("\n\n{}\n\n", body);
 
         Ok(Response::build()
             .status(Status::InternalServerError)
@@ -81,14 +86,16 @@ Debug Information:
 }
 
 /// Entrypoint to mark a habit.
-#[get("/api/habit/mark/<habit_name>")]
+///
+/// TODO: Make this read in JSON taking in an optional time to mark at.
+#[get("/api/habit/mark/<habit_name_raw>")]
 pub async fn mark_habit(
     pool: State<'_, SqlitePool>,
-    habit_name: &RawStr,
+    habit_name_raw: &RawStr,
 ) -> Result<String, ResponseError> {
     // TODO: Figure out how to more nicely go directly to a ResponseError. This wrapping is
     // currently required such that we can return anyhow errors everywhere.
-    match handle_mark_habit(&pool, habit_name).await {
+    match handle_mark_habit(&pool, habit_name_raw).await {
         Err(err) => Err(ResponseError(err)),
         Ok(val) => Ok(val),
     }
@@ -97,8 +104,18 @@ pub async fn mark_habit(
 /// The logic to mark a habit.
 pub async fn handle_mark_habit(
     pool: &State<'_, SqlitePool>,
-    habit_name: &RawStr,
+    habit_name_raw: &RawStr,
 ) -> anyhow::Result<String> {
-    let _connection = pool.acquire().await?;
-    Ok(format!("Looks good for habit '{}'!", habit_name))
+    let habit_name = habit_name_raw.url_decode()?;
+    let connection = pool.acquire().await?;
+
+    let mut habit = database::Habit {
+        connection,
+        name: habit_name,
+    };
+
+    // TODO: Verify the date.
+    habit.mark_habit().await?;
+
+    Ok(format!("Habit '{}' has been marked as done!", &habit.name))
 }

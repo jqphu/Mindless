@@ -1,9 +1,7 @@
 /target/
 
 # Don't commit the actual database nor temporary files.
-habits.db
-habits.db-shm
-habits.db-wal
+*.db*
 
 # Don't add .env file.
 .env

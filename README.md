@@ -4,4 +4,4 @@ You require a `.env` file within the server which defines a DATABASE_URL. This w
 your database.
 
 E.g.
-`DATABASE_URL="file:data/habits.db"`
+`DATABASE_URL="sqlite:data/habits.db"`
