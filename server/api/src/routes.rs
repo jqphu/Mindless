@@ -39,7 +39,7 @@ impl<'r> Responder<'r> for ResponseError {
     }
 }
 
-#[get("/")]
+#[get("/mindless")]
 pub async fn index() -> &'static str {
     "
  **       **   ********   **           ******      *******     ****     ****   ********
@@ -54,7 +54,7 @@ pub async fn index() -> &'static str {
 }
 
 /// Default and only favicon.
-#[get("/favicon.ico")]
+#[get("/mindless/favicon.ico")]
 pub async fn favicon() -> Option<NamedFile> {
     NamedFile::open("static/favicon.ico").ok()
 }
@@ -88,7 +88,7 @@ Debug Information:
 /// Entrypoint to mark a habit.
 ///
 /// TODO: Make this read in JSON taking in an optional time to mark at.
-#[get("/api/habit/mark/<habit_name_raw>")]
+#[get("/mindless/api/habit/mark/<habit_name_raw>")]
 pub async fn mark_habit(
     pool: State<'_, SqlitePool>,
     habit_name_raw: &RawStr,

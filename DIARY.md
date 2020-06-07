@@ -23,6 +23,17 @@ VALUES
 I assume it is faster if we do this as a single query as opposed to extracting the id and then
 inserting a habit into a table. However, for simplicity let's separate this into two steps.
 
+Setting up NGINX reverse proxy on digital ocean too. Pretty simple:
+
+```
+localion /mindless/ {
+  proxy_pass http://127.0.0.1:8000;
+}
+```
+
+in `/etc/nginx/sites-available/default`. Should probably make a custom file and not put it in
+default.
+
 # [2020-05-31] 13:38
 
 Let's add some trivial habits by string.
