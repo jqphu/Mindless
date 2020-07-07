@@ -1,3 +1,18 @@
+# [2020-07-07]  05:15 - 06:38
+Let's make this a daily thing.
+
+Goal: Get basic flutter app working.
+
+Installed a bunch of dependencies (I should have wrote down steps...) and now have flutter app running on android and web. This should be fun!
+
+This was easier than I though :D.
+
+Next steps:
+* Hard coded tracking with http request sent.
+* Ability to add / remove habits.
+* Verification in the server of double clicked habits.
+
+
 # [2020-06-07] 15:34
 
 Continuing. Now I have a database connection let's add a habit.
