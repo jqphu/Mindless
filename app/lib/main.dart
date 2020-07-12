@@ -19,16 +19,14 @@ class HabitsState extends State<Habits> {
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   Widget _buildSuggestions() {
-    return ListView.builder(
+    return ListView.separated(
         padding: const EdgeInsets.all(16.0),
-
-        // We have double the habits to account for the dividers.
-        itemCount: _habits.length * 2,
+        itemCount: _habits.length,
         itemBuilder: (context, i) {
-          if (i.isOdd) return Divider();
-
-          final index = i ~/ 2;
-          return _buildRow(_habits[index]);
+          return _buildRow(_habits[i]);
+        },
+        separatorBuilder: (context, i) {
+          return Divider();
         });
   }
 
