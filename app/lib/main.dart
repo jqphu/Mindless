@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:english_words/english_words.dart';
 
 void main() => runApp(MyApp());
 
@@ -8,87 +7,63 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Startup Name Generator',
-      home: RandomWords(),
+      home: Habits(),
     );
   }
 }
 
-class RandomWordsState extends State<RandomWords> {
-  final _suggestions = <WordPair>[];
-  final _saved = Set<WordPair>();
+class HabitsState extends State<Habits> {
+  // TODO: Retrieve habits from database.
+  final _habits = <String>["Wakeup early", "Meditate", "Exercise"];
+  final _completed = Set<String>();
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   Widget _buildSuggestions() {
     return ListView.builder(
         padding: const EdgeInsets.all(16.0),
-        itemBuilder: /*1*/ (context, i) {
-          if (i.isOdd) return Divider(); /*2*/
 
-          final index = i ~/ 2; /*3*/
-          if (index >= _suggestions.length) {
-            _suggestions.addAll(generateWordPairs().take(10)); /*4*/
-          }
-          return _buildRow(_suggestions[index]);
+        // We have double the habits to account for the dividers.
+        itemCount: _habits.length * 2,
+        itemBuilder: (context, i) {
+          if (i.isOdd) return Divider();
+
+          final index = i ~/ 2;
+          return _buildRow(_habits[index]);
         });
   }
 
-  Widget _buildRow(WordPair pair) {
-    final alreadySaved = _saved.contains(pair);
+  Widget _buildRow(String habit) {
+    final isCompleted = _completed.contains(habit);
     return ListTile(
         title: Text(
-          pair.asPascalCase,
+          habit,
           style: _biggerFont,
         ),
         trailing: Icon(
-          alreadySaved ? Icons.favorite : Icons.favorite_border,
-          color: alreadySaved ? Colors.red : null,
+          isCompleted ? Icons.done : Icons.done_outline,
+          color: isCompleted ? Colors.red : null,
         ),
         onTap: () {
           setState(() {
-            if (alreadySaved) {
-              _saved.remove(pair);
+            if (isCompleted) {
+              _completed.remove(habit);
             } else {
-              _saved.add(pair);
+              _completed.add(habit);
             }
           });
         });
   }
 
-  void _pushSaved() {
-    Navigator.of(context)
-        .push(MaterialPageRoute<void>(builder: (BuildContext context) {
-      final tiles = _saved.map((WordPair pair) {
-        return ListTile(
-          title: Text(pair.asPascalCase, style: _biggerFont),
-        );
-      });
-
-      final divided = ListTile.divideTiles(
-        context: context,
-        tiles: tiles,
-      ).toList();
-
-      return Scaffold(
-        appBar: AppBar(
-          title: Text('Saved Suggestions'),
-        ),
-        body: ListView(children: divided),
-      );
-    }));
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Startup Name Generator'), actions: [
-        IconButton(icon: Icon(Icons.list), onPressed: _pushSaved),
-      ]),
+      appBar: AppBar(title: Text('Mindless')),
       body: _buildSuggestions(),
     );
   }
 }
 
-class RandomWords extends StatefulWidget {
+class Habits extends StatefulWidget {
   @override
-  RandomWordsState createState() => new RandomWordsState();
+  HabitsState createState() => new HabitsState();
 }
