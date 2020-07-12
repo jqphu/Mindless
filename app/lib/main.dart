@@ -19,20 +19,26 @@ class HabitsState extends State<Habits> {
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
   Widget _buildSuggestions() {
-    return ListView.separated(
-        padding: const EdgeInsets.all(16.0),
-        itemCount: _habits.length,
-        itemBuilder: (context, i) {
-          return _buildRow(_habits[i]);
-        },
-        separatorBuilder: (context, i) {
-          return Divider();
+    return ReorderableListView(
+        children: List.generate(_habits.length, (index) {
+          return _buildRow(_habits[index]);
+        }),
+        onReorder: (oldIndex, newIndex) {
+          setState(() {
+            if (newIndex > oldIndex) {
+              newIndex -= 1;
+            }
+
+            final String item = _habits.removeAt(oldIndex);
+            _habits.insert(newIndex, item);
+          });
         });
   }
 
   Widget _buildRow(String habit) {
     final isCompleted = _completed.contains(habit);
     return ListTile(
+        key: ValueKey(habit),
         title: Text(
           habit,
           style: _biggerFont,
