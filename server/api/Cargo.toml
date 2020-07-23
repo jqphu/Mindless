@@ -8,6 +8,7 @@ edition = "2018"
 [dependencies]
 dotenv = "0.15.0"
 anyhow = "1.0.31"
+chrono = "0.4"
 
 [dependencies.rocket]
 git = "https://github.com/SergioBenitez/Rocket.git"

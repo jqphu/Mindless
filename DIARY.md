@@ -1,3 +1,15 @@
+# [2020-07-22]  20:53
+Bit of a late one but J Cole dropped two songs so you know we coding tonight.
+
+Let's work on the server again and write some Rust.
+
+Goal:
+* Get habits flagged only once per day.
+  * Hardcode to SF time for now...
+* Send data using JSON instead of just a raw path.
+  * Will make it easier for us to expand later.
+
+
 # [2020-07-20]  06:30 - 08:30
 Yes daily...
 

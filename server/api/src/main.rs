@@ -2,6 +2,7 @@
 
 #[macro_use]
 extern crate rocket;
+extern crate chrono;
 extern crate dotenv;
 
 use sqlx::SqlitePool;
