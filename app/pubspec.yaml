@@ -29,6 +29,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.3
 
+  # To make http request.
+  http: ^0.12.2
+
+  # Fancy logging
+  logger: ^0.9.1
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

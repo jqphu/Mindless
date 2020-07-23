@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter/foundation.dart' as foundation;
+import 'package:logger/logger.dart';
+
+var logger = Logger(printer: PrettyPrinter());
 
 void main() => runApp(MyApp());
 
@@ -12,9 +17,24 @@ class MyApp extends StatelessWidget {
   }
 }
 
+Future<http.Response> markHabitHttpRequest(String habit) {
+  var endpoint;
+  if (foundation.kReleaseMode) {
+    endpoint = "https://jqphu.dev";
+  } else {
+    // TODO: Different port depending on Android vs Web
+    endpoint = "http://10.0.2.2";
+  }
+
+  final habitEndpoint = endpoint + "/mindless/api/habit/mark";
+  final fullRequestPath = habitEndpoint + "/" + habit;
+  logger.d("Making http request to: " + fullRequestPath);
+  return http.get(fullRequestPath);
+}
+
 class HabitsState extends State<Habits> {
   // TODO: Retrieve habits from database.
-  final _habits = <String>["Wakeup early", "Meditate", "Exercise"];
+  final _habits = <String>["WakeupEarly", "Meditate", "Exercise"];
   final _completed = Set<String>();
   final _biggerFont = const TextStyle(fontSize: 18.0);
 
@@ -53,6 +73,8 @@ class HabitsState extends State<Habits> {
               _completed.remove(habit);
             } else {
               _completed.add(habit);
+              // TODO: Don't ignore the result.
+              markHabitHttpRequest(habit);
             }
           });
         });

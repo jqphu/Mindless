@@ -1,3 +1,20 @@
+# [2020-07-20]  06:30 - 08:30
+Yes daily...
+
+Goal: Get a simple http request going 
+
+Struggled quite a bit with this :P. But learnt a bunch.
+First we can't use localhost because localhost is the loopback for the android device itself. This
+makes sense! Instead the emulator uses 10.0.2.2 to represent the host device. Ended up using this
+but kept getting a connection denied. The error message showed a random port which seems to be a
+flutter deficiency. Once I figured that out I still couldn't figure out why I couldn't reach my
+endpoint. I thought it was the firewall but I disabled my iptables service and it didn't help. Then
+I realized the port 8000 is closed of course. So I set up nginx to accept http requests on port 80
+and send them to my localhost server. Horrah! It worked.
+
+Need to set it up with SSL but hey at least I can quickly iterate locally now :) 
+
+
 # [2020-07-07]  05:15 - 06:38
 Let's make this a daily thing.
 
