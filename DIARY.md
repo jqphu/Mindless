@@ -1,10 +1,17 @@
-# [2020-07-22]  18:54
+# [2020-07-23]  16:00
+
+Goal:
+* Update JSON being sent.
+* Creating / Deleting habits.
+
+
+# [2020-07-22]  18:54 - 23:07
 
 Goal:
 * Set up habits to be marked only once a day. 
 * Unmark habits. 
-* Stretch: JSONify 
-* Stretch: Creating habits from the flutter app.
+* Stretch: JSONify 
+* Stretch: Creating habits from the flutter app.  
 
 Used tool: https://httpie.org/
 
@@ -23,6 +30,9 @@ Simple examples:
   should_mark: true
 }
 ```
+
+TODO: Integrate the jsonified interface into flutter.
+TODO: Pre-commit hook for testing rust server.
 
 # [2020-07-22]  20:53
 Bit of a late one but J Cole dropped two songs so you know we coding tonight.
