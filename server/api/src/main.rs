@@ -5,6 +5,8 @@ extern crate rocket;
 extern crate chrono;
 extern crate dotenv;
 
+extern crate serde;
+
 use sqlx::SqlitePool;
 
 // List of all the routes.
@@ -27,6 +29,7 @@ async fn main() {
     liftoff(database_url)
         .await
         .launch()
+        .await
         .expect("Successful launch.");
 }
 

@@ -1,8 +1,9 @@
 # [2020-07-22]  18:54
 
 Goal:
-* Set up habits to be marked only once a day.
-* Unmark habits.
+* Set up habits to be marked only once a day. 
+* Unmark habits. 
+* Stretch: JSONify 
 * Stretch: Creating habits from the flutter app.
 
 # [2020-07-22]  20:53

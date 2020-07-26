@@ -1,6 +1,7 @@
 use rocket::http::{ContentType, Status};
 use rocket::response::{self, Responder, Response};
 use rocket::{http::RawStr, response::NamedFile, Request, State};
+use serde::Deserialize;
 use sqlx::SqlitePool;
 use std::io::Cursor;
 
@@ -17,9 +18,8 @@ pub struct ResponseError(anyhow::Error);
 // TODO: Remove this once we update clippy to fix this error.
 // I think this is an async fn bug (https://github.com/rust-lang/rust-clippy/issues/3988).
 #[allow(clippy::needless_lifetimes)]
-#[rocket::async_trait]
-impl<'r> Responder<'r> for ResponseError {
-    async fn respond_to(self, request: &'r Request<'_>) -> response::Result<'r> {
+impl<'r> Responder<'r, 'static> for ResponseError {
+    fn respond_to(self, request: &'r Request<'_>) -> response::Result<'static> {
         let body = format!(
             "Error: {:#?}\n\nRequest: {:#?}\n\nBacktrace: {:#?}",
             self.0,
@@ -27,15 +27,11 @@ impl<'r> Responder<'r> for ResponseError {
             self.0.backtrace()
         );
 
-        // Print the error to the console too.
-        println!("\n\n{}\n\n", body);
-
-        Ok(Response::build()
+        Response::build()
+            .sized_body(body.len(), Cursor::new(body))
             .status(Status::InternalServerError)
             .header(ContentType::Plain)
-            .sized_body(Cursor::new(body))
-            .await
-            .finalize())
+            .ok()
     }
 }
 
@@ -55,8 +51,11 @@ pub async fn index() -> &'static str {
 
 /// Default and only favicon.
 #[get("/mindless/favicon.ico")]
-pub async fn favicon() -> Option<NamedFile> {
-    NamedFile::open("static/favicon.ico").ok()
+pub async fn favicon() -> NamedFile {
+    // TODO: Don't assume this always exists.
+    NamedFile::open("static/favicon.ico")
+        .await
+        .expect("does not error")
 }
 
 #[catch(404)]
