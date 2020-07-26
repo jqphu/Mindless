@@ -51,9 +51,16 @@ VALUES ( ? )
 
     /// Mark a habit as completed.
     ///
+    /// This will be a no-op if the habit is already set today.
+    ///
     /// This will create the habit if it does not exist.
     pub async fn mark_habit(&mut self) -> Result<()> {
         let id = self.get_id_or_create().await?;
+        if self.is_set_today().await? {
+            return Ok(());
+        }
+
+        println!("Marking a habit today!");
 
         // We explicitly use the '?' operator to allow a conversion to an anyhow error.
         sqlx::query!(
@@ -72,7 +79,7 @@ VALUES ( ? )
     /// Check if a habit is set.
     ///
     /// This will create the habit if it does not exist.
-    pub async fn is_set_today(&mut self) -> Result<bool> {
+    async fn is_set_today(&mut self) -> Result<bool> {
         let id = self.get_id_or_create().await?;
 
         // We explicitly use the '?' operator to allow a conversion to an anyhow error.

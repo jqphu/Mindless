@@ -114,7 +114,6 @@ pub async fn handle_mark_habit(
         name: habit_name,
     };
 
-    // TODO: Verify the date.
     habit.mark_habit().await?;
 
     Ok(format!("Habit '{}' has been marked as done!", &habit.name))
