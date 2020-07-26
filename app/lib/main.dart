@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart' as foundation;
 import 'package:logger/logger.dart';
+import 'dart:convert';
 
 var logger = Logger(printer: PrettyPrinter());
 
@@ -25,17 +26,20 @@ Future<http.Response> habitHttpRequest(String habit, bool markHabit) {
     // TODO: Different port depending on Android vs Web
     endpoint = "http://10.0.2.2";
   }
-  var habitAction;
-  if (markHabit) {
-    habitAction = "mark";
-  } else {
-    habitAction = "unmark";
-  }
 
-  final habitEndpoint = endpoint + "/mindless/api/habit/" + habitAction;
-  final fullRequestPath = habitEndpoint + "/" + habit;
-  logger.d("Making http request to: " + fullRequestPath);
-  return http.get(fullRequestPath);
+  final habitEndpoint = endpoint + "/mindless/api/habit";
+  logger.d("Making http request to: " +
+      habitEndpoint +
+      " with habit string " +
+      habit +
+      " and should_mark " +
+      markHabit.toString());
+
+  return http.post(habitEndpoint,
+      body: jsonEncode({
+        "name": habit,
+        "should_mark": markHabit,
+      }));
 }
 
 class HabitsState extends State<Habits> {
