@@ -1,8 +1,9 @@
 # [2020-07-23]  16:00
 
 Goal:
-* Update JSON being sent.
+* Update JSON being sent. 
 * Creating / Deleting habits.
+* Add users / authentication.
 
 
 # [2020-07-22]  18:54 - 23:07

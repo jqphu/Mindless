@@ -18,7 +18,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Future<http.Response> habitHttpRequest(String habit, bool markHabit) {
+void habitHttpRequest(String habit, bool markHabit) async {
   var endpoint;
   if (foundation.kReleaseMode) {
     endpoint = "https://jqphu.dev";
@@ -35,11 +35,17 @@ Future<http.Response> habitHttpRequest(String habit, bool markHabit) {
       " and should_mark " +
       markHabit.toString());
 
-  return http.post(habitEndpoint,
+  final response = await http.post(habitEndpoint,
       body: jsonEncode({
         "name": habit,
         "should_mark": markHabit,
       }));
+
+  final body = jsonDecode(response.body);
+
+  logger.d(
+      "Response from request was:  status: ${response.statusCode}, body: " +
+          body.toString());
 }
 
 class HabitsState extends State<Habits> {
