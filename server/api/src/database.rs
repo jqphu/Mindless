@@ -52,15 +52,20 @@ VALUES ( ? )
     /// Unmark a habit.
     ///
     /// This will be a no-op if the habit is already set today.
-    ///
     /// This will create the habit if it does not exist.
-    pub async fn unmark_habit(&mut self) -> Result<()> {
+    ///
+    /// Returns Ok(true) when we unmark a habit from the database. Ok(false) is returned when
+    /// unmarking a habit is not needed is not needed.
+    pub async fn unmark_habit(&mut self) -> Result<bool> {
         let habit_instance_id = match self.get_habit_set_today().await? {
-            None => return Ok(()),
+            None => return Ok(false),
             Some(habit_instance_id) => habit_instance_id,
         };
 
-        println!("Unmark habit {}", &self.name);
+        println!(
+            "Unmark habit {} with instance id {:#?}",
+            &self.name, habit_instance_id
+        );
 
         // We explicitly use the '?' operator to allow a conversion to an anyhow error.
         sqlx::query!(
@@ -72,26 +77,26 @@ VALUES ( ? )
         .execute(&mut self.connection)
         .await?;
 
-        Ok(())
+        Ok(true)
     }
 
     /// Mark a habit as completed.
     ///
     /// This will be a no-op if the habit is already set today.
-    ///
     /// This will create the habit if it does not exist.
-    pub async fn mark_habit(&mut self) -> Result<()> {
+    ///
+    /// Returns Ok(true) when we mark a habit in the database. Ok(false) is returned when marking
+    /// is not needed.
+    pub async fn mark_habit(&mut self) -> Result<bool> {
         let id = self.get_id_or_create().await?;
 
         // Habit already set, do nothing.
         if self.get_habit_set_today().await?.is_some() {
-            return Ok(());
+            return Ok(false);
         }
 
-        println!("Mark habit {}", &self.name);
-
         // We explicitly use the '?' operator to allow a conversion to an anyhow error.
-        sqlx::query!(
+        let habit_instance_id = sqlx::query!(
             r#"
         INSERT INTO habit ( habit_id )
         VALUES ( ? )
@@ -101,7 +106,12 @@ VALUES ( ? )
         .execute(&mut self.connection)
         .await?;
 
-        Ok(())
+        println!(
+            "Mark habit {} with parent id {:#?} instance id {:#?}",
+            &self.name, id, habit_instance_id
+        );
+
+        Ok(true)
     }
 
     /// Get the habit that has been set today.
@@ -120,9 +130,12 @@ VALUES ( ? )
             r#"
             SELECT id, completed_time
             FROM habit
-            WHERE completed_time=
-            (SELECT MAX(completed_time) FROM habit WHERE habit_id = ( ? ))"#,
+            WHERE habit_id=( ? )
+            AND completed_time=
+            (SELECT MAX(completed_time) FROM habit WHERE habit_id = ( ? ))
+            "#,
             id,
+            id
         )
         .fetch_one(&mut self.connection)
         .await;
@@ -165,6 +178,8 @@ VALUES ( ? )
             Some(id) => id,
             None => self.create_habit().await?,
         };
+
+        println!("Extracted parent id of {}", id);
 
         return Ok(id);
     }

@@ -11,6 +11,9 @@ Used tool: https://httpie.org/
 This allows us to send HTTP requests from the command line. This is incredibly useful when doing
 POST/PUT requests.
 
+The script `reset_database.sh` is used only when we call Cargo tests. Calling this script directly
+will fail since it can only be called from the path `server/api`
+
 Simple examples:
 `http localhost:8000/mindless/api/habit < test_file.json` where
 `test_file` looks like:

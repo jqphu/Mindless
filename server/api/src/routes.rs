@@ -2,7 +2,7 @@ use rocket::http::{ContentType, Status};
 use rocket::response::{self, Responder, Response};
 use rocket::{response::NamedFile, Request, State};
 use rocket_contrib::json::Json;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use sqlx::SqlitePool;
 use std::io::Cursor;
 
@@ -21,6 +21,8 @@ pub struct ResponseError(anyhow::Error);
 #[allow(clippy::needless_lifetimes)]
 impl<'r> Responder<'r, 'static> for ResponseError {
     fn respond_to(self, request: &'r Request<'_>) -> response::Result<'static> {
+        println!("Error is: {:#?}", &self.0);
+
         let body = format!(
             "Error: {:#?}\n\nRequest: {:#?}\n\nBacktrace: {:#?}",
             self.0,
@@ -85,8 +87,9 @@ Debug Information:
     )
 }
 
-#[derive(Deserialize, Debug)]
-pub struct HabitRequestMetadata {
+/// The JSON request object when manipulating habits.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HabitRequest {
     // The name of the habit we are requesting on.
     name: String,
 
@@ -94,11 +97,17 @@ pub struct HabitRequestMetadata {
     should_mark: bool,
 }
 
+impl HabitRequest {
+    pub fn new(name: String, should_mark: bool) -> Self {
+        HabitRequest { name, should_mark }
+    }
+}
+
 #[post("/mindless/api/habit", data = "<habit_request_json>")]
 pub async fn habit(
     pool: State<'_, SqlitePool>,
-    habit_request_json: Json<HabitRequestMetadata>,
-) -> Result<String, ResponseError> {
+    habit_request_json: Json<HabitRequest>,
+) -> Result<Json<HabitResponse>, ResponseError> {
     println!(
         "Habit request post received with data: {:#?}",
         habit_request_json
@@ -114,7 +123,29 @@ pub async fn habit(
 
     match result {
         Err(err) => Err(ResponseError(err)),
-        Ok(val) => Ok(val),
+        Ok(val) => Ok(Json(val)),
+    }
+}
+
+/// The JSON reponse object.
+///
+/// This contains any logical errors or other useful information.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HabitResponse {
+    // Whether the request was successful.
+    pub succeded: bool,
+
+    // Some additional metadata if needed.
+    pub metadata: Option<String>,
+}
+
+impl HabitResponse {
+    /// Create a habit response.
+    pub fn new(succeded: bool, metadata: Option<String>) -> Self {
+        HabitResponse {
+            succeded,
+            metadata: metadata,
+        }
     }
 }
 
@@ -122,7 +153,7 @@ pub async fn habit(
 pub async fn handle_unmark_habit(
     pool: State<'_, SqlitePool>,
     habit_name: String,
-) -> anyhow::Result<String> {
+) -> anyhow::Result<HabitResponse> {
     let connection = pool.acquire().await?;
 
     let mut habit = database::Habit {
@@ -130,19 +161,16 @@ pub async fn handle_unmark_habit(
         name: habit_name,
     };
 
-    habit.unmark_habit().await?;
+    let succeeded = habit.unmark_habit().await?;
 
-    Ok(format!(
-        "Habit '{}' has been unmarked as done!",
-        &habit.name
-    ))
+    Ok(HabitResponse::new(succeeded, None))
 }
 
 /// The logic to mark a habit.
 pub async fn handle_mark_habit(
     pool: State<'_, SqlitePool>,
     habit_name: String,
-) -> anyhow::Result<String> {
+) -> anyhow::Result<HabitResponse> {
     let connection = pool.acquire().await?;
 
     let mut habit = database::Habit {
@@ -150,7 +178,7 @@ pub async fn handle_mark_habit(
         name: habit_name,
     };
 
-    habit.mark_habit().await?;
+    let succeeded = habit.mark_habit().await?;
 
-    Ok(format!("Habit '{}' has been marked as done!", &habit.name))
+    Ok(HabitResponse::new(succeeded, None))
 }

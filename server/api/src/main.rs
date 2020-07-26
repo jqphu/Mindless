@@ -6,6 +6,7 @@ extern crate chrono;
 extern crate dotenv;
 
 extern crate serde;
+extern crate serde_json;
 
 use sqlx::SqlitePool;
 
