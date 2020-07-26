@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
-Future<http.Response> markHabitHttpRequest(String habit) {
+Future<http.Response> habitHttpRequest(String habit, bool markHabit) {
   var endpoint;
   if (foundation.kReleaseMode) {
     endpoint = "https://jqphu.dev";
@@ -25,8 +25,14 @@ Future<http.Response> markHabitHttpRequest(String habit) {
     // TODO: Different port depending on Android vs Web
     endpoint = "http://10.0.2.2";
   }
+  var habitAction;
+  if (markHabit) {
+    habitAction = "mark";
+  } else {
+    habitAction = "unmark";
+  }
 
-  final habitEndpoint = endpoint + "/mindless/api/habit/mark";
+  final habitEndpoint = endpoint + "/mindless/api/habit/" + habitAction;
   final fullRequestPath = habitEndpoint + "/" + habit;
   logger.d("Making http request to: " + fullRequestPath);
   return http.get(fullRequestPath);
@@ -71,10 +77,11 @@ class HabitsState extends State<Habits> {
           setState(() {
             if (isCompleted) {
               _completed.remove(habit);
+              habitHttpRequest(habit, false);
             } else {
               _completed.add(habit);
               // TODO: Don't ignore the result.
-              markHabitHttpRequest(habit);
+              habitHttpRequest(habit, true);
             }
           });
         });
