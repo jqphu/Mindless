@@ -6,6 +6,21 @@ Goal:
 * Stretch: JSONify 
 * Stretch: Creating habits from the flutter app.
 
+Used tool: https://httpie.org/
+
+This allows us to send HTTP requests from the command line. This is incredibly useful when doing
+POST/PUT requests.
+
+Simple examples:
+`http localhost:8000/mindless/api/habit < test_file.json` where
+`test_file` looks like:
+```
+{
+  name: Gym,
+  should_mark: true
+}
+```
+
 # [2020-07-22]  20:53
 Bit of a late one but J Cole dropped two songs so you know we coding tonight.
 

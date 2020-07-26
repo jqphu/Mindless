@@ -18,7 +18,7 @@ mod database;
 #[cfg(test)]
 mod tests;
 
-#[async_std::main]
+#[tokio::main]
 async fn main() {
     // Read the environment variables from .env file.
     dotenv::dotenv().ok();
@@ -43,14 +43,6 @@ pub async fn liftoff(database_url: &str) -> rocket::Rocket {
                 .await
                 .expect("SqlitePool must be creatable."),
         )
-        .mount(
-            "/",
-            routes![
-                routes::index,
-                routes::favicon,
-                routes::mark_habit,
-                routes::unmark_habit
-            ],
-        )
+        .mount("/", routes![routes::index, routes::favicon, routes::habit,])
         .register(catchers![routes::not_found])
 }

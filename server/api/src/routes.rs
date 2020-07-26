@@ -1,6 +1,7 @@
 use rocket::http::{ContentType, Status};
 use rocket::response::{self, Responder, Response};
-use rocket::{http::RawStr, response::NamedFile, Request, State};
+use rocket::{response::NamedFile, Request, State};
+use rocket_contrib::json::Json;
 use serde::Deserialize;
 use sqlx::SqlitePool;
 use std::io::Cursor;
@@ -84,16 +85,34 @@ Debug Information:
     )
 }
 
-/// Entrypoint to unmark a habit.
-///
-#[get("/mindless/api/habit/unmark/<habit_name_raw>")]
-pub async fn unmark_habit(
+#[derive(Deserialize, Debug)]
+pub struct HabitRequestMetadata {
+    // The name of the habit we are requesting on.
+    name: String,
+
+    // Whether to mark or unmark the request.
+    should_mark: bool,
+}
+
+#[post("/mindless/api/habit", data = "<habit_request_json>")]
+pub async fn habit(
     pool: State<'_, SqlitePool>,
-    habit_name_raw: &RawStr,
+    habit_request_json: Json<HabitRequestMetadata>,
 ) -> Result<String, ResponseError> {
-    // TODO: Figure out how to more nicely go directly to a ResponseError. This wrapping is
-    // currently required such that we can return anyhow errors everywhere.
-    match handle_unmark_habit(&pool, habit_name_raw).await {
+    println!(
+        "Habit request post received with data: {:#?}",
+        habit_request_json
+    );
+
+    let habit_request = habit_request_json.into_inner();
+
+    let result = if habit_request.should_mark {
+        handle_mark_habit(pool, habit_request.name).await
+    } else {
+        handle_unmark_habit(pool, habit_request.name).await
+    };
+
+    match result {
         Err(err) => Err(ResponseError(err)),
         Ok(val) => Ok(val),
     }
@@ -101,10 +120,9 @@ pub async fn unmark_habit(
 
 /// The logic to unmark a habit.
 pub async fn handle_unmark_habit(
-    pool: &State<'_, SqlitePool>,
-    habit_name_raw: &RawStr,
+    pool: State<'_, SqlitePool>,
+    habit_name: String,
 ) -> anyhow::Result<String> {
-    let habit_name = habit_name_raw.url_decode()?;
     let connection = pool.acquire().await?;
 
     let mut habit = database::Habit {
@@ -120,28 +138,11 @@ pub async fn handle_unmark_habit(
     ))
 }
 
-/// Entrypoint to mark a habit.
-///
-/// TODO: Make this read in JSON taking in an optional time to mark at.
-#[get("/mindless/api/habit/mark/<habit_name_raw>")]
-pub async fn mark_habit(
-    pool: State<'_, SqlitePool>,
-    habit_name_raw: &RawStr,
-) -> Result<String, ResponseError> {
-    // TODO: Figure out how to more nicely go directly to a ResponseError. This wrapping is
-    // currently required such that we can return anyhow errors everywhere.
-    match handle_mark_habit(&pool, habit_name_raw).await {
-        Err(err) => Err(ResponseError(err)),
-        Ok(val) => Ok(val),
-    }
-}
-
 /// The logic to mark a habit.
 pub async fn handle_mark_habit(
-    pool: &State<'_, SqlitePool>,
-    habit_name_raw: &RawStr,
+    pool: State<'_, SqlitePool>,
+    habit_name: String,
 ) -> anyhow::Result<String> {
-    let habit_name = habit_name_raw.url_decode()?;
     let connection = pool.acquire().await?;
 
     let mut habit = database::Habit {
