@@ -85,6 +85,42 @@ Debug Information:
     )
 }
 
+/// Entrypoint to unmark a habit.
+///
+#[get("/mindless/api/habit/unmark/<habit_name_raw>")]
+pub async fn unmark_habit(
+    pool: State<'_, SqlitePool>,
+    habit_name_raw: &RawStr,
+) -> Result<String, ResponseError> {
+    // TODO: Figure out how to more nicely go directly to a ResponseError. This wrapping is
+    // currently required such that we can return anyhow errors everywhere.
+    match handle_unmark_habit(&pool, habit_name_raw).await {
+        Err(err) => Err(ResponseError(err)),
+        Ok(val) => Ok(val),
+    }
+}
+
+/// The logic to unmark a habit.
+pub async fn handle_unmark_habit(
+    pool: &State<'_, SqlitePool>,
+    habit_name_raw: &RawStr,
+) -> anyhow::Result<String> {
+    let habit_name = habit_name_raw.url_decode()?;
+    let connection = pool.acquire().await?;
+
+    let mut habit = database::Habit {
+        connection,
+        name: habit_name,
+    };
+
+    habit.unmark_habit().await?;
+
+    Ok(format!(
+        "Habit '{}' has been unmarked as done!",
+        &habit.name
+    ))
+}
+
 /// Entrypoint to mark a habit.
 ///
 /// TODO: Make this read in JSON taking in an optional time to mark at.

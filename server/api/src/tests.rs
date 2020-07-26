@@ -19,20 +19,31 @@ async fn test_welcome_page() {
 }
 
 #[async_std::test]
-async fn test_mark_habit() {
+async fn test_habit() {
     let rocket = liftoff("sqlite:data/test.db").await;
     let client = Client::new(rocket).expect("valid rocket instance");
 
     // TODO: Move these to separate tests. This isn't done at the moment since we haven't set up
     // shutdown for rocket server.
 
+    let habit_name = "Task";
+
     // Test adding a task.
-    let response = client.get("/mindless/api/habit/mark/Task").dispatch().await;
+    let response = client
+        .get(format!("/mindless/api/habit/mark/{}", habit_name))
+        .dispatch()
+        .await;
     assert_eq!(response.status(), Status::Ok);
 
     // Test using a web url.
     let response = client
         .get("/mindless/api/habit/mark/Task%20test")
+        .dispatch()
+        .await;
+    assert_eq!(response.status(), Status::Ok);
+
+    let response = client
+        .get(format!("/mindless/api/habit/unmark/{}", habit_name))
         .dispatch()
         .await;
     assert_eq!(response.status(), Status::Ok);

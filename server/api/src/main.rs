@@ -42,7 +42,12 @@ pub async fn liftoff(database_url: &str) -> rocket::Rocket {
         )
         .mount(
             "/",
-            routes![routes::index, routes::favicon, routes::mark_habit],
+            routes![
+                routes::index,
+                routes::favicon,
+                routes::mark_habit,
+                routes::unmark_habit
+            ],
         )
         .register(catchers![routes::not_found])
 }

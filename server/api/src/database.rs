@@ -49,6 +49,32 @@ VALUES ( ? )
         Ok(id.expect("ID must exist since we just inserted it"))
     }
 
+    /// Unmark a habit.
+    ///
+    /// This will be a no-op if the habit is already set today.
+    ///
+    /// This will create the habit if it does not exist.
+    pub async fn unmark_habit(&mut self) -> Result<()> {
+        let habit_instance_id = match self.get_habit_set_today().await? {
+            None => return Ok(()),
+            Some(habit_instance_id) => habit_instance_id,
+        };
+
+        println!("Unmark habit {}", &self.name);
+
+        // We explicitly use the '?' operator to allow a conversion to an anyhow error.
+        sqlx::query!(
+            r#"
+        DELETE FROM habit WHERE id = ( ? )
+            "#,
+            habit_instance_id
+        )
+        .execute(&mut self.connection)
+        .await?;
+
+        Ok(())
+    }
+
     /// Mark a habit as completed.
     ///
     /// This will be a no-op if the habit is already set today.
@@ -56,11 +82,13 @@ VALUES ( ? )
     /// This will create the habit if it does not exist.
     pub async fn mark_habit(&mut self) -> Result<()> {
         let id = self.get_id_or_create().await?;
-        if self.is_set_today().await? {
+
+        // Habit already set, do nothing.
+        if self.get_habit_set_today().await?.is_some() {
             return Ok(());
         }
 
-        println!("Marking a habit today!");
+        println!("Mark habit {}", &self.name);
 
         // We explicitly use the '?' operator to allow a conversion to an anyhow error.
         sqlx::query!(
@@ -76,10 +104,13 @@ VALUES ( ? )
         Ok(())
     }
 
-    /// Check if a habit is set.
+    /// Get the habit that has been set today.
     ///
     /// This will create the habit if it does not exist.
-    async fn is_set_today(&mut self) -> Result<bool> {
+    ///
+    /// Returns None if the habit has not been set today otherwise returns Some with the habit
+    /// instance id.
+    async fn get_habit_set_today(&mut self) -> Result<Option<i32>> {
         let id = self.get_id_or_create().await?;
 
         // We explicitly use the '?' operator to allow a conversion to an anyhow error.
@@ -87,7 +118,7 @@ VALUES ( ? )
         // we have the select statement by itself.
         let fetched_result = sqlx::query!(
             r#"
-            SELECT completed_time
+            SELECT id, completed_time
             FROM habit
             WHERE completed_time=
             (SELECT MAX(completed_time) FROM habit WHERE habit_id = ( ? ))"#,
@@ -96,11 +127,13 @@ VALUES ( ? )
         .fetch_one(&mut self.connection)
         .await;
 
-        let last_set_utc_time = match fetched_result {
-            Ok(result) => result.completed_time,
+        println!("Fetched result is {:?}", fetched_result);
+
+        let (habit_instance_id, last_set_utc_time) = match fetched_result {
+            Ok(result) => (result.id, result.completed_time),
             // Couldn't find a completed_time means this habit has never been set.
             // Return early.
-            Err(sqlx::Error::RowNotFound) => return Ok(false),
+            Err(sqlx::Error::RowNotFound) => return Ok(None),
             Err(e) => return Err(anyhow::Error::new(e)),
         };
 
@@ -116,8 +149,12 @@ VALUES ( ? )
             last_set_date_time, current_date_time, duration_difference
         );
 
-        // Already been set!
-        Ok(duration_difference.num_days() == 0)
+        if duration_difference.num_days() == 0 {
+            // Already been set!
+            Ok(habit_instance_id)
+        } else {
+            Ok(None)
+        }
     }
 
     /// Get the id of this habit. If one isn't found, it will create one.
