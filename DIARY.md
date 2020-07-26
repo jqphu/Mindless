@@ -1,3 +1,10 @@
+# [2020-07-22]  18:54
+
+Goal:
+* Set up habits to be marked only once a day.
+* Unmark habits.
+* Stretch: Creating habits from the flutter app.
+
 # [2020-07-22]  20:53
 Bit of a late one but J Cole dropped two songs so you know we coding tonight.
 
