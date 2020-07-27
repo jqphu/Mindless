@@ -2,9 +2,9 @@
 
 Goal:
 * Update JSON being sent. 
-* Creating / Deleting habits.
+* Creating / Deleting habits. 
+* Set up digital ocean sever?
 * Add users / authentication.
-
 
 # [2020-07-22]  18:54 - 23:07
 

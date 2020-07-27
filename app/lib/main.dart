@@ -84,8 +84,15 @@ class HabitsState extends State<Habits> {
           });
 
           // Show a snackbar. This snackbar could also contain "Undo" actions.
-          Scaffold.of(context)
-              .showSnackBar(SnackBar(content: Text("$habit dismissed")));
+          Scaffold.of(context).showSnackBar(SnackBar(
+              content: Text("$habit dismissed"),
+              action: SnackBarAction(
+                  label: "UNDO",
+                  onPressed: () {
+                    setState(() {
+                      _habits.insert(index, habit);
+                    });
+                  })));
         },
         background: Container(color: Colors.red),
         child: ListTile(
