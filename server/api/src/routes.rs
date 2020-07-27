@@ -103,6 +103,77 @@ impl HabitRequest {
     }
 }
 
+/// The JSON reponse object.
+///
+/// This contains any logical errors or other useful information.
+#[derive(Serialize, Deserialize, Debug)]
+pub struct HabitResponse {
+    // Whether the request was successful.
+    pub succeded: bool,
+
+    // Some additional metadata if needed.
+    pub metadata: Option<String>,
+}
+
+impl HabitResponse {
+    /// Create a habit response.
+    pub fn new(succeded: bool, metadata: Option<String>) -> Self {
+        HabitResponse {
+            succeded,
+            metadata: metadata,
+        }
+    }
+}
+
+// What to do on a user.
+#[derive(Deserialize, Debug)]
+enum UserAction {
+    // Create a user.
+    CREATE,
+
+    // Delete a user.
+    DELETE,
+}
+
+/// The JSON request object when manipulating user.
+#[derive(Deserialize, Debug)]
+pub struct UserRequests {
+    username: String,
+
+    // Action to be applied to username.
+    action: UserAction,
+}
+
+// Handle all interfacing with user.
+#[post("/mindless/api/user", data = "<user_request>")]
+pub async fn user(
+    pool: State<'_, SqlitePool>,
+    user_request: Json<UserRequests>,
+) -> Result<Json<bool>, ResponseError> {
+    match handle_user_request(pool, user_request.into_inner()).await {
+        Err(err) => Err(ResponseError(err)),
+        Ok(val) => Ok(Json(val)),
+    }
+}
+
+pub async fn handle_user_request(
+    pool: State<'_, SqlitePool>,
+    user_request: UserRequests,
+) -> anyhow::Result<bool> {
+    let mut user = database::User::new(pool.acquire().await?, user_request.username).await?;
+
+    match user_request.action {
+        UserAction::CREATE => {
+            // Do nothing, the user is always egarly create in new.
+        }
+        UserAction::DELETE => {
+            user.delete().await?;
+        }
+    }
+
+    Ok(true)
+}
+
 #[post("/mindless/api/habit", data = "<habit_request_json>")]
 pub async fn habit(
     pool: State<'_, SqlitePool>,
@@ -124,28 +195,6 @@ pub async fn habit(
     match result {
         Err(err) => Err(ResponseError(err)),
         Ok(val) => Ok(Json(val)),
-    }
-}
-
-/// The JSON reponse object.
-///
-/// This contains any logical errors or other useful information.
-#[derive(Serialize, Deserialize, Debug)]
-pub struct HabitResponse {
-    // Whether the request was successful.
-    pub succeded: bool,
-
-    // Some additional metadata if needed.
-    pub metadata: Option<String>,
-}
-
-impl HabitResponse {
-    /// Create a habit response.
-    pub fn new(succeded: bool, metadata: Option<String>) -> Self {
-        HabitResponse {
-            succeded,
-            metadata: metadata,
-        }
     }
 }
 

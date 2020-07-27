@@ -211,3 +211,95 @@ VALUES ( ? )
         }
     }
 }
+
+/// This is a struct representing a user.
+///
+/// It abstracts the sql queries away.
+pub struct User {
+    /// The sqlite connection. We keep this alive for as long as this Habit is alive.
+    connection: PoolConnection<SqliteConnection>,
+
+    /// The name of this user.
+    name: String,
+
+    /// The user id.
+    id: i32,
+}
+
+impl User {
+    // Create a new connection to the database representing a user.
+    pub async fn new(connection: PoolConnection<SqliteConnection>, name: String) -> Result<Self> {
+        let mut user = User {
+            connection,
+            name,
+            id: 0,
+        };
+
+        user.create().await?;
+
+        Ok(user)
+    }
+
+    /// Create a user if needed.
+    pub async fn create(&mut self) -> Result<()> {
+        // We explicitly use the '?' operator to allow a conversion to an anyhow error.
+        // Silently drop the error that constraint has been violated.
+        // TODO: Check if any other errors happened and return them.
+        sqlx::query!(
+            r#"
+INSERT INTO users ( username )
+VALUES ( ? )
+        "#,
+            &self.name
+        )
+        .execute(&mut self.connection)
+        .await;
+
+        let fetched_result = sqlx::query!(
+            r#"
+    SELECT id FROM users WHERE username=?
+            "#,
+            &self.name
+        )
+        .fetch_one(&mut self.connection)
+        .await;
+
+        let id = match fetched_result {
+            // Value was found.
+            Ok(fetched_value) => fetched_value.id,
+
+            // Unknown error.
+            Err(e) => return Err(anyhow::Error::new(e)),
+        };
+
+        self.id = id.expect("ID must exist since we just inserted it");
+        Ok(())
+    }
+
+    /// Delete a user.
+    /// Return a true if we deleted the user. Otherwise, return false.
+    pub async fn delete(&mut self) -> Result<bool> {
+        println!("Deleting user {}", &self.name);
+
+        // We explicitly use the '?' operator to allow a conversion to an anyhow error.
+        let fetched_result = sqlx::query!(
+            r#"
+        DELETE FROM users WHERE id = ( ? )
+            "#,
+            self.id
+        )
+        .execute(&mut self.connection)
+        .await;
+
+        match fetched_result {
+            // Value was found.
+            Ok(_) => Ok(true),
+
+            // Value was not found.
+            Err(sqlx::Error::RowNotFound) => Ok(false),
+
+            // Unknown error.
+            Err(e) => Err(anyhow::Error::new(e)),
+        }
+    }
+}

@@ -3,8 +3,18 @@
 Goal:
 * Update JSON being sent. 
 * Creating / Deleting habits. 
-* Set up digital ocean sever?
-* Add users / authentication.
+* Set up digital ocean sever? 
+* High priority: Users
+* High priority: authentication.
+ * Sessions.
+ * Login screen flutter.
+* Figure out how to get app on the app store.
+* Visualization of data. SQL -> excel.
+  * Create an endpoint to download data.
+* Stretch: Hierarchical style habits
+
+TODO: Dedup habits on client side and remove case sensitivity.
+TODO: Make this repo public.
 
 # [2020-07-22]  18:54 - 23:07
 

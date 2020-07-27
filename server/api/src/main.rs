@@ -44,6 +44,9 @@ pub async fn liftoff(database_url: &str) -> rocket::Rocket {
                 .await
                 .expect("SqlitePool must be creatable."),
         )
-        .mount("/", routes![routes::index, routes::favicon, routes::habit,])
+        .mount(
+            "/",
+            routes![routes::index, routes::favicon, routes::habit, routes::user],
+        )
         .register(catchers![routes::not_found])
 }
