@@ -1,7 +1,6 @@
-# [2020-07-23]  17:30
+# [2020-07-23]  17:30 - 19:35
 Goal:
 * Server side to understand associate habits with users.
-
 
 ```
 .headers on
@@ -15,6 +14,12 @@ SELECT * FROM habit
 INNER JOIN habit_log ON habit.habit_id=habit_log.id
 INNER JOIN users ON habit_log.user_id=users.id;
 ```
+
+TODO:
+* Use [provider package](https://pub.dev/packages/provider) to share data between states.
+* Hash the email to send to the database as the "username".
+* Look into using dummy facebook account to login
+* Facebook auth only works for Android app. iOS has different setup and I'm not sure about web.
 
 # [2020-07-23]  16:00 - 20:00
 
