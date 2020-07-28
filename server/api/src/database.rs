@@ -245,7 +245,7 @@ impl User {
         // We explicitly use the '?' operator to allow a conversion to an anyhow error.
         // Silently drop the error that constraint has been violated.
         // TODO: Check if any other errors happened and return them.
-        sqlx::query!(
+        let _ignored_error = sqlx::query!(
             r#"
 INSERT INTO users ( username )
 VALUES ( ? )

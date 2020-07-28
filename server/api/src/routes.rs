@@ -98,6 +98,7 @@ pub struct HabitRequest {
 }
 
 impl HabitRequest {
+    #[cfg(test)]
     pub fn new(name: String, should_mark: bool) -> Self {
         HabitRequest { name, should_mark }
     }
