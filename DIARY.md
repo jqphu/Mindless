@@ -1,4 +1,8 @@
-# [2020-07-23]  16:00
+# [2020-07-23]  17:30
+Goal:
+* Server side to understand associate habits with users.
+
+# [2020-07-23]  16:00 - 20:00
 
 Goal:
 * Update JSON being sent. 
@@ -13,8 +17,9 @@ Goal:
   * Create an endpoint to download data.
 * Stretch: Hierarchical style habits
 
-TODO: Dedup habits on client side and remove case sensitivity.
+TODO: Fix code not working???? (on droplet)
 TODO: Make this repo public.
+TODO: Dedup habits on client side and remove case sensitivity.
 
 # [2020-07-22]  18:54 - 23:07
 
