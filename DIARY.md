@@ -2,6 +2,20 @@
 Goal:
 * Server side to understand associate habits with users.
 
+
+```
+.headers on
+.mode line
+```
+.headers on to contain column names in SQL query.
+.mode line to make the format human readable.
+
+```
+SELECT * FROM habit
+INNER JOIN habit_log ON habit.habit_id=habit_log.id
+INNER JOIN users ON habit_log.user_id=users.id;
+```
+
 # [2020-07-23]  16:00 - 20:00
 
 Goal:

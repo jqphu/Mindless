@@ -90,6 +90,9 @@ Debug Information:
 /// The JSON request object when manipulating habits.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct HabitRequest {
+    // The name of the user.
+    username: String,
+
     // The name of the habit we are requesting on.
     name: String,
 
@@ -99,8 +102,12 @@ pub struct HabitRequest {
 
 impl HabitRequest {
     #[cfg(test)]
-    pub fn new(name: String, should_mark: bool) -> Self {
-        HabitRequest { name, should_mark }
+    pub fn new(username: String, name: String, should_mark: bool) -> Self {
+        HabitRequest {
+            username,
+            name,
+            should_mark,
+        }
     }
 }
 
@@ -188,9 +195,9 @@ pub async fn habit(
     let habit_request = habit_request_json.into_inner();
 
     let result = if habit_request.should_mark {
-        handle_mark_habit(pool, habit_request.name).await
+        handle_mark_habit(pool, habit_request.username, habit_request.name).await
     } else {
-        handle_unmark_habit(pool, habit_request.name).await
+        handle_unmark_habit(pool, habit_request.username, habit_request.name).await
     };
 
     match result {
@@ -202,6 +209,7 @@ pub async fn habit(
 /// The logic to unmark a habit.
 pub async fn handle_unmark_habit(
     pool: State<'_, SqlitePool>,
+    username: String,
     habit_name: String,
 ) -> anyhow::Result<HabitResponse> {
     let connection = pool.acquire().await?;
@@ -209,6 +217,7 @@ pub async fn handle_unmark_habit(
     let mut habit = database::Habit {
         connection,
         name: habit_name,
+        user: database::User::new(pool.acquire().await?, username).await?,
     };
 
     let succeeded = habit.unmark_habit().await?;
@@ -219,6 +228,7 @@ pub async fn handle_unmark_habit(
 /// The logic to mark a habit.
 pub async fn handle_mark_habit(
     pool: State<'_, SqlitePool>,
+    username: String,
     habit_name: String,
 ) -> anyhow::Result<HabitResponse> {
     let connection = pool.acquire().await?;
@@ -226,6 +236,7 @@ pub async fn handle_mark_habit(
     let mut habit = database::Habit {
         connection,
         name: habit_name,
+        user: database::User::new(pool.acquire().await?, username).await?,
     };
 
     let succeeded = habit.mark_habit().await?;

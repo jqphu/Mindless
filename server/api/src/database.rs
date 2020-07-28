@@ -20,6 +20,9 @@ pub struct Habit {
     /// The sqlite connection. We keep this alive for as long as this Habit is alive.
     pub connection: PoolConnection<SqliteConnection>,
 
+    /// User that this habit belongs to.
+    pub user: User,
+
     /// The name of this habit.
     pub name: String,
 }
@@ -32,12 +35,15 @@ impl Habit {
     /// Instead of create and returning an error, let's just be safe and get_id_or_create. Fix this
     /// naming.
     pub async fn create_habit(&mut self) -> Result<i32> {
+        let user_id = self.user.get_id();
+
         // We explicitly use the '?' operator to allow a conversion to an anyhow error.
         sqlx::query!(
             r#"
-INSERT INTO habit_log ( habit_name )
-VALUES ( ? )
+INSERT INTO habit_log ( user_id, habit_name )
+VALUES ( ?, ? )
         "#,
+            user_id,
             &self.name
         )
         .execute(&mut self.connection)
@@ -192,9 +198,10 @@ VALUES ( ? )
     async fn get_id(&mut self) -> Result<Option<i32>> {
         let fetched_result = sqlx::query!(
             r#"
-    SELECT id FROM habit_log WHERE habit_name=?
+    SELECT id FROM habit_log WHERE habit_name=? AND user_id=?
             "#,
-            &self.name
+            &self.name,
+            &self.user.get_id()
         )
         .fetch_one(&mut self.connection)
         .await;
@@ -238,6 +245,11 @@ impl User {
         user.create().await?;
 
         Ok(user)
+    }
+
+    /// Get the UserId.
+    pub fn get_id(&self) -> i32 {
+        self.id
     }
 
     /// Create a user if needed.

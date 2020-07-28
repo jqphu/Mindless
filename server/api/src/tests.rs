@@ -31,8 +31,8 @@ async fn test_welcome_page() {
 }
 
 /// Whether the request succeeded or failed.
-async fn habit_request(client: &Client, task: &str, mark: bool) -> bool {
-    let mark_habit_request = HabitRequest::new(task.to_string(), mark);
+async fn habit_request(client: &Client, username: &str, task: &str, mark: bool) -> bool {
+    let mark_habit_request = HabitRequest::new(username.to_string(), task.to_string(), mark);
     let response = client
         .post("/mindless/api/habit")
         .header(ContentType::JSON)
@@ -55,29 +55,53 @@ async fn test_habit() {
     let rocket = liftoff("sqlite:data/test.db").await;
     let client = Client::new(rocket).await.expect("valid rocket instance");
 
+    test_single_user(&client).await;
+    test_multiple_users(&client).await;
+}
+
+async fn test_single_user(client: &Client) {
     // TODO: Move these to separate tests. This isn't done at the moment since we haven't set up
     // shutdown for rocket server.
     let task_name = "Task";
+    let username = "test_user";
 
     // Mark succeeds.
-    assert!(habit_request(&client, task_name, true).await);
+    assert!(habit_request(&client, username, task_name, true).await);
 
     //// Second mark fails.
-    assert!(!habit_request(&client, task_name, true).await);
+    assert!(!habit_request(&client, username, task_name, true).await);
 
     //// Unmarking succeeds.
-    assert!(habit_request(&client, task_name, false).await);
+    assert!(habit_request(&client, username, task_name, false).await);
 
     //// Second unmark fails.
-    assert!(!habit_request(&client, task_name, false).await);
+    assert!(!habit_request(&client, username, task_name, false).await);
 
     // Marking multiple habits.
-    assert!(habit_request(&client, "abc", true).await);
-    assert!(habit_request(&client, "zxc", true).await);
-    assert!(habit_request(&client, "Test habit!", true).await);
+    assert!(habit_request(&client, username, "abc", true).await);
+    assert!(habit_request(&client, username, "zxc", true).await);
+    assert!(habit_request(&client, username, "Test habit!", true).await);
 
     // Unmark multiple habits.
-    assert!(habit_request(&client, "zxc", false).await);
-    assert!(habit_request(&client, "Test habit!", false).await);
-    assert!(habit_request(&client, "abc", false).await);
+    assert!(habit_request(&client, username, "zxc", false).await);
+    assert!(habit_request(&client, username, "Test habit!", false).await);
+    assert!(habit_request(&client, username, "abc", false).await);
+}
+
+async fn test_multiple_users(client: &Client) {
+    let username_a = "test_user_a";
+    let username_b = "test_user_b";
+
+    let task_a = "task_a";
+    let task_b = "task_b";
+
+    assert!(habit_request(&client, username_a, task_a, true).await);
+    assert!(habit_request(&client, username_b, task_b, true).await);
+    assert!(habit_request(&client, username_a, task_b, true).await);
+    assert!(habit_request(&client, username_b, task_a, true).await);
+
+    assert!(habit_request(&client, username_b, task_a, false).await);
+    assert!(habit_request(&client, username_b, task_b, false).await);
+    assert!(habit_request(&client, username_a, task_b, false).await);
+    assert!(habit_request(&client, username_a, task_a, false).await);
 }
