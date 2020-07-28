@@ -35,6 +35,8 @@ dependencies:
   # Fancy logging
   logger: ^0.9.1
 
+  flutter_facebook_login: ^1.2.0
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

@@ -45,3 +45,6 @@ app.*.map.json
 
 # VScode
 .vscode
+
+# Ignore secrets for android app.
+android/app/src/main/res/values/strings.xml
