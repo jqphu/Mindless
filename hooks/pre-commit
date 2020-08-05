@@ -9,3 +9,4 @@
 
 # Assume CWD is project root aka mindless/...
 hooks/validate_schema.sh || exit 1
+hooks/pre-commit_database.sh || exit 1

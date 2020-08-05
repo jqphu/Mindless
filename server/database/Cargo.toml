@@ -1,0 +1,15 @@
+[package]
+name = "database"
+version = "0.1.0"
+authors = ["Justin Phu <justinqphu@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+anyhow = "1.0.31"
+
+[dependencies.sqlx]
+version = "0.3.5"
+features = ["sqlite"]
+
