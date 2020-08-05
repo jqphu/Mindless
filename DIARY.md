@@ -1,6 +1,8 @@
-# [2020-07-23]  17:30 - 19:35
+# [2020-08-03]  17:30 - 19:35
 Goal:
 * Server side to understand associate habits with users.
+
+Added BRAINSTORM file to show the new structure.
 
 ```
 .headers on
