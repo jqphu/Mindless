@@ -10,7 +10,13 @@ pub struct User {
 }
 
 impl User {
-    // Create a new connection to the database representing a user.
+    /// Create a new connection to the database representing a user.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let user = database::user::User::new("Justin".to_string());
+    /// ```
     pub async fn new(name: String) -> Self {
         User { id: 0, name }
     }
