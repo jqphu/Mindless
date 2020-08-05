@@ -6,7 +6,15 @@
 # it wants to stop the commit.
 #
 # To enable this hook, rename this file to "pre-commit".
+set -e
 
 # Assume CWD is project root aka mindless/...
-hooks/validate_schema.sh || exit 1
-hooks/pre-commit_database.sh || exit 1
+git diff --cached --name-only | if grep --quiet "server/api/data/Mindless.sql"
+then
+  hooks/validate_schema.sh || exit 1
+fi
+
+git diff --cached --name-only | if grep --quiet "server/database"
+then
+  hooks/pre-commit_database.sh || exit 1
+fi
