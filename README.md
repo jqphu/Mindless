@@ -5,3 +5,7 @@ your database.
 
 E.g.
 `DATABASE_URL="sqlite:data/habits.db"`
+
+## Hooks
+
+Set up hooks path `git config core.hooksPath hooks` to use the git commit hooks
