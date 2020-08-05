@@ -1,8 +1,21 @@
-# [2020-08-03]  17:30 - 19:35
+# [2020-08-03]  17:45 - 19:40
 Goal:
 * Server side to understand associate habits with users.
 
 Added BRAINSTORM file to show the new structure.
+
+Achieved:
+* Added new database schema
+* Added git hooks to verify the schema is syntactically correct.
+* Added new database rust library
+* Added git hooks for doc testing
+
+Learnings:
+Need to add `set -e` to ensure bash will exit immediately when a simple command fails. E.g. if
+you're doing command || exit 1 you should add `set -e` or it won't work unless it is the last
+command.
+
+# [2020-07-27]  17:30 - 19:35
 
 ```
 .headers on
