@@ -1,0 +1,71 @@
+#!/usr/bin/python
+
+import argparse
+import os
+import git
+import sqlite3
+import subprocess
+
+from typing import List, Optional
+
+DATABASE_RELATIVE_PATH = 'server/database'
+SCHEMA_FILE_NAME = 'mindless.sql'
+
+def get_git_root():
+    git_repo = git.Repo('.', search_parent_directories=True)
+    git_root = git_repo.git.rev_parse('--show-toplevel')
+    return git_root
+
+def setup_temporary_database(data_path: str, database_name: str):
+    database_path = os.path.join(data_path, database_name);
+
+    if os.path.exists(database_path):
+      os.remove(database_path)
+
+    os.environ['DATABASE_URL'] = f'sqlite::{database_path}'
+
+    # Create a temporary database which will last until this script ends.
+    connection = sqlite3.connect(database_path)
+
+    with open(os.path.join(data_path, SCHEMA_FILE_NAME)) as f:
+        read_schema = f.read()
+        connection.executescript(read_schema)
+
+    # Force closing to drop the file lock before running anything else.
+    connection.close()
+
+def run_cargo_command(database_path: str, command: List[str]):
+    cargo_toml_path = os.path.join(database_path, "Cargo.toml")
+    command = ["cargo"] + command + ["--manifest-path", cargo_toml_path]
+    print(f"Running command {' '.join(command)}")
+    subprocess.run(command, check=True)
+
+def main(args):
+    repo_root = get_git_root()
+    print(f'Running build script with git root at {repo_root}')
+
+    database_path = os.path.join(repo_root, DATABASE_RELATIVE_PATH)
+
+    data_path = os.path.join(database_path, "data")
+    print(f'Resetting database at {data_path}');
+    setup_temporary_database(data_path, "temporary.db")
+
+    if args.commands:
+        print(f'Building cargo');
+        run_cargo_command(database_path, args.commands)
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+            description='''
+            Run database cargo commands.
+            Sets up the temporary environment including the database and environment variables.
+            '''
+    )
+
+    parser.add_argument('commands', type=str, nargs='*',
+                   help='Command to tell cargo to run')
+
+    args = parser.parse_args()
+
+    # execute only if run as a script
+    main(args)

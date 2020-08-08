@@ -15,6 +15,22 @@ pub enum Error {
     UnknownSql(sqlx::Error),
 }
 
+impl PartialEq for Error {
+    fn eq(&self, other: &Self) -> bool {
+        use Error::*;
+        if let (AlreadyExists, AlreadyExists) |
+            // For the sake of simplicity, we treat all UnknownSql errors the same.
+            (UnknownSql(_), UnknownSql(_))
+                = (&self, &other) {
+                    return true;
+        }
+
+        false
+    }
+}
+
+impl Eq for Error {}
+
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {

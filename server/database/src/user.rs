@@ -7,6 +7,7 @@ use sqlx::SqliteConnection;
 /// This is a struct representing a user.
 ///
 /// It abstracts the sql queries away.
+#[derive(Debug)]
 pub struct User {
     /// The user id.
     pub id: i32,
@@ -71,14 +72,37 @@ mod tests {
     use super::*;
 
     #[tokio::test]
-    async fn can_create_user() {
-        let db_url = std::env::var("DATABASE_URL").expect("Should have a Database URL env set.");
-        let connection = Connection::connect(&db_url).await.expect("Should connect");
+    async fn create_user() {
+        let connection = Connection::connect_temporary_with_schema()
+            .await
+            .expect("Should connect");
+
         let name = "Justin";
         let result = User::insert(name, &connection)
             .await
             .expect("Should successfully insert. ");
 
         assert_eq!(result.name, name);
+    }
+
+    #[tokio::test]
+    async fn fail_if_already_exists() {
+        let connection = Connection::connect_temporary_with_schema()
+            .await
+            .expect("Should connect");
+
+        let name = "DuplicateUser";
+        let result = User::insert(name, &connection)
+            .await
+            .expect("Should successfully insert.");
+        assert_eq!(result.name, name);
+
+        let name = "DuplicateUser";
+        let result = User::insert(name, &connection).await;
+
+        assert_eq!(
+            result.expect_err("Should have failed due to duplication"),
+            crate::error::Error::AlreadyExists
+        );
     }
 }

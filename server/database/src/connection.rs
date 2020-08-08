@@ -37,4 +37,17 @@ impl Connection {
     pub async fn acquire(&self) -> Result<PoolConnection<SqliteConnection>> {
         Ok(self.pool.acquire().await?)
     }
+
+    /// Connect to an in memory database also loading the schema.
+    #[cfg(test)]
+    pub async fn connect_temporary_with_schema() -> Result<Self> {
+        let pool = Connection::connect("sqlite::").await?;
+        let connection = pool.acquire().await?;
+
+        sqlx::query_file!("data/mindless.sql")
+            .execute(connection)
+            .await?;
+
+        Ok(pool)
+    }
 }

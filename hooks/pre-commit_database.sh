@@ -11,15 +11,11 @@ function verify_call {
   fi
 }
 
-manifest_file="server/database/Cargo.toml"
+cargo_wrap_file="server/database/scripts/cargo_wrap"
 
 # Format files
-# Build
-verify_call "cargo build --manifest-path $manifest_file"
-
-# Run Tests
-verify_call "cargo test --manifest-path $manifest_file"
+# Build & Run Tests
+verify_call "$cargo_wrap_file test"
 
 # Run Clippy
-verify_call "cargo clippy --manifest-path $manifest_file"
-
+verify_call "$cargo_wrap_file clippy"
