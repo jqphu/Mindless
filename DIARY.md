@@ -39,8 +39,28 @@ else since theres no such thing as a "constructor" in rust except for:
 There is no easy way to poll a future to completion. In order to test my async fn's I bring a full
 runtime.
 
+## Connection granularity
+A connection per request?
+A connection per transaction?
+A connection held forever?
+
+Let's keep this very fine grained and start with a connection per transaction. This is the cleanest
+and easiest to implement.
+
+Long connections are bad due to connection issues.
+
+Connection per request may be more optimal (do lots of work before at once) but this is an
+optimization. And what do we say to early optimizations? Not today!
+
 On a metanote. The fact that I can ask a question to a discord chat and get a response in a few
 minutes is fascinating. What a great time to be learning.
+
+## Build scripts
+
+Currently Cargo build needs the database set up to run sql queries. We need to write a python script
+that wraps cargo build and sets up the DB if it doesn't exist! TODO...
+
+Also needs to set up database url.
 
 # [2020-08-03]  17:45 - 19:40
 Goal:

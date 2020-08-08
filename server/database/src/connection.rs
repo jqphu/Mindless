@@ -1,5 +1,6 @@
-use anyhow::Result;
-use sqlx::SqlitePool;
+use crate::error::Result;
+use sqlx::pool::PoolConnection;
+use sqlx::{SqliteConnection, SqlitePool};
 
 /// A simple database abstraction which contains the db info.
 ///
@@ -8,7 +9,7 @@ use sqlx::SqlitePool;
 ///
 /// We use this as a dependency injection as opposed to using a global static.
 pub struct Connection {
-    connection: SqlitePool,
+    pool: SqlitePool,
 }
 
 impl Connection {
@@ -23,12 +24,17 @@ impl Connection {
     /// #[tokio::main]
     /// # async fn main() {
     ///     let database = database::connection::Connection::connect("sqlite::memory:").await;
-    /// #   assert!(false, "Should be able to connect to the in memory database.");
+    /// #   assert!(database.is_ok(), "Should be able to connect to the in memory database.");
     /// # }
     /// ```
     pub async fn connect(sqlite3_db_uri: &str) -> Result<Self> {
         Ok(Connection {
-            connection: SqlitePool::new(sqlite3_db_uri).await?,
+            pool: SqlitePool::new(sqlite3_db_uri).await?,
         })
+    }
+
+    /// Acquire a single connection to the database.
+    pub async fn acquire(&self) -> Result<PoolConnection<SqliteConnection>> {
+        Ok(self.pool.acquire().await?)
     }
 }

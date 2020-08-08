@@ -16,4 +16,4 @@ features = ["sqlite"]
 # Used to test our async functions.
 [dev-dependencies.tokio]
 version = "0.2.22"
-features = ["macros"]
+features = ["macros", "rt-threaded"]
