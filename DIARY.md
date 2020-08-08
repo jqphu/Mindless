@@ -1,3 +1,47 @@
+# [2020-08-08]  10:18 -
+A little focus time with copyrighted music before streaming :P 
+Goal:
+ * Get database interface to work.
+
+## To global or not to global
+I want to be able to hide the type of database from the routes code but instead
+provide an opaque database object.
+
+My initial thought was to simply have a global connection pool object so when you
+execute a transaction or update on a User it will silently grab a connection object
+in the database.
+
+This is a very c-like model and method. I was looking for the equivalent of ELF constructor
+to initialize my global.
+
+I think the correct way to do this in a high level language is to expose these is to use dependency
+injection. I will create a Database object and pass that around as state. The benefit of this method
+is:
+1. No global uninitialized state (which is hard to do in rust, could have used a lazy static but
+then I don't get an error until I try to connect).
+2. Make the dependency explicit! Less global initialization but be clear that you need this database
+   object and where.
+
+## Rust constructor?
+I have a database object, I want to ensure during construction it is completely valid and connected.
+The downside is it is async and returns a Result. This seemed a bit strange to have a `new` that did
+so much work.
+
+Asked Rust group and convention is `new` should always just return `Self`. So just name it something
+else since theres no such thing as a "constructor" in rust except for:
+  ```rust
+  Database {
+    field1: val
+  }
+  ```
+
+## Testing async fn
+There is no easy way to poll a future to completion. In order to test my async fn's I bring a full
+runtime.
+
+On a metanote. The fact that I can ask a question to a discord chat and get a response in a few
+minutes is fascinating. What a great time to be learning.
+
 # [2020-08-03]  17:45 - 19:40
 Goal:
 * Server side to understand associate habits with users.
