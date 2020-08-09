@@ -28,7 +28,7 @@ impl Connection {
     /// ```
     pub async fn connect(sqlite3_db_uri: &str) -> Result<Self> {
         Ok(Connection {
-            pool: SqlitePool::new(sqlite3_db_uri).await?,
+            pool: SqlitePool::connect(sqlite3_db_uri).await?,
         })
     }
 
@@ -40,7 +40,7 @@ impl Connection {
     /// Connect to an in memory database also loading the schema.
     #[cfg(test)]
     pub async fn connect_temporary_with_schema() -> Result<Self> {
-        let connection = Connection::connect("sqlite::").await?;
+        let connection = Connection::connect("sqlite://").await?;
 
         sqlx::query_file!("data/mindless.sql")
             .execute(connection.get_pool())

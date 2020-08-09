@@ -1,6 +1,10 @@
 # [2020-08-09]  01:05
 Yeah, what a strange time to get started. I guess we can call this a hackathon :).
 
+* Update to latest version of sqlx
+
+This update seemed to also fix the failure to grab lock :D.
+
 # [2020-08-08]  10:18 - ~15:00
 A little focus time with copyrighted music before streaming :P 
 Goal:

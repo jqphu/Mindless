@@ -22,6 +22,7 @@ impl PartialEq for Error {
     fn eq(&self, other: &Self) -> bool {
         use Error::*;
         if let (AlreadyExists, AlreadyExists) |
+                (NotFound, NotFound) |
             // For the sake of simplicity, we treat all UnknownSql errors the same.
             (UnknownSql(_), UnknownSql(_))
                 = (&self, &other) {

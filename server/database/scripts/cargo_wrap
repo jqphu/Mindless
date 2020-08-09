@@ -22,7 +22,7 @@ def setup_temporary_database(data_path: str, database_name: str):
     if os.path.exists(database_path):
       os.remove(database_path)
 
-    os.environ['DATABASE_URL'] = f'sqlite::{database_path}'
+    os.environ['DATABASE_URL'] = f'sqlite:///{database_path}'
 
     # Create a temporary database which will last until this script ends.
     connection = sqlite3.connect(database_path)
@@ -32,6 +32,7 @@ def setup_temporary_database(data_path: str, database_name: str):
         connection.executescript(read_schema)
 
     # Force closing to drop the file lock before running anything else.
+    connection.commit()
     connection.close()
 
 def run_cargo_command(database_path: str, command: List[str]):

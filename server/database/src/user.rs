@@ -1,5 +1,6 @@
 use crate::connection::Connection;
 use crate::error::{Error, Result};
+use sqlx::Done;
 
 /// This is a struct representing a user.
 ///
@@ -7,7 +8,7 @@ use crate::error::{Error, Result};
 #[derive(Debug)]
 pub struct User {
     /// The user id.
-    id: i32,
+    id: i64,
 
     /// The name of this user.
     name: String,
@@ -69,7 +70,9 @@ impl User {
         .execute(connection.get_pool())
         .await?;
 
-        if deleted_row_count == 0 {
+        println!("deleted_row_count {:#?}", deleted_row_count);
+
+        if deleted_row_count.rows_affected() == 0 {
             Err(Error::NotFound)
         } else {
             Ok(())
@@ -96,26 +99,6 @@ mod tests {
     }
 
     #[tokio::test]
-    async fn delete_user() {
-        let connection = Connection::connect_temporary_with_schema()
-            .await
-            .expect("Should connect");
-
-        let name = "Justin";
-        let user = User::insert(&name, &connection)
-            .await
-            .expect("Should successfully insert. ");
-
-        user.delete(&connection)
-            .await
-            .expect("Can delete newly added user.");
-
-        User::insert(&name, &connection)
-            .await
-            .expect("Can add the user again.");
-    }
-
-    #[tokio::test]
     async fn fail_if_already_exists() {
         let connection = Connection::connect_temporary_with_schema()
             .await
@@ -131,8 +114,43 @@ mod tests {
         let result = User::insert(name, &connection).await;
 
         assert_eq!(
-            result.expect_err("Should have failed due to duplication"),
+            result.expect_err("Should have failed due to duplication."),
             crate::error::Error::AlreadyExists
+        );
+    }
+
+    #[tokio::test]
+    async fn delete_user() {
+        let connection = Connection::connect_temporary_with_schema()
+            .await
+            .expect("Should connect");
+
+        let name = "Justin";
+        let user = User::insert(&name, &connection)
+            .await
+            .expect("Should successfully insert. ");
+
+        user.delete(&connection)
+            .await
+            .expect("Can delete newly added user.");
+    }
+
+    #[tokio::test]
+    async fn fail_delete_non_existent_user() {
+        let connection = Connection::connect_temporary_with_schema()
+            .await
+            .expect("Should connect");
+
+        let user = User {
+            id: 123,
+            name: "hello".to_string(),
+        };
+
+        let result = user.delete(&connection).await;
+
+        assert_eq!(
+            result.expect_err("Should fail due to not existing."),
+            crate::error::Error::NotFound
         );
     }
 }

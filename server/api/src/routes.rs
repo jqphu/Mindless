@@ -236,10 +236,10 @@ pub async fn handle_mark_habit(
     let mut habit = database::Habit {
         connection,
         name: habit_name,
-        user: database::User::new(pool.acquire().await?, username).await?,
+        user: database::User::new(pool.acquire().await?, username).await?
     };
 
-    let succeeded = habit.mark_habit().await?;
+    let succeeded = habit.mark_habit().await?
 
     Ok(HabitResponse::new(succeeded, None))
 }
