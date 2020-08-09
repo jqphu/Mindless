@@ -1,9 +1,13 @@
-# [2020-08-09]  01:05
+# [2020-08-09]  01:05 - 4:22
 Yeah, what a strange time to get started. I guess we can call this a hackathon :).
 
 * Update to latest version of sqlx
 
 This update seemed to also fix the failure to grab lock :D.
+
+E2E INTEGRATION! No tests yet though.
+
+Figure out how to do some e2e tests.
 
 # [2020-08-08]  10:18 - ~15:00
 A little focus time with copyrighted music before streaming :P 
