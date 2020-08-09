@@ -17,3 +17,7 @@ features = ["sqlite"]
 [dev-dependencies.tokio]
 version = "0.2.22"
 features = ["macros", "rt-threaded"]
+
+[dependencies.serde]
+version = "1.0"
+features = ["derive"]

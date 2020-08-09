@@ -10,8 +10,14 @@ extern crate serde_json;
 // Database queries.
 extern crate database;
 
-// List of all the routes.
+// List of common routes.
 mod routes;
+
+// User routes
+mod user;
+
+// Errors
+mod error;
 
 #[tokio::main]
 async fn main() {
@@ -35,6 +41,6 @@ pub async fn liftoff(database_url: &str) -> rocket::Rocket {
                 .await
                 .expect("Should connect to database."),
         )
-        .mount("/", routes![routes::index, routes::favicon])
+        .mount("/", routes![routes::index, routes::favicon, user::user])
         .register(catchers![routes::not_found])
 }

@@ -60,14 +60,17 @@ impl error::Error for Error {
 /// Implement forwarding conversion from sqlx error.
 impl From<sqlx::Error> for Error {
     fn from(err: sqlx::Error) -> Error {
-        if let sqlx::error::Error::Database(e) = &err {
-            if let Some(code) = e.code() {
-                if SQLITE_CONSTRAINT_UNIQUE_CODE == code {
-                    return Error::AlreadyExists;
+        match &err {
+            sqlx::error::Error::Database(e) => {
+                if let Some(code) = e.code() {
+                    if SQLITE_CONSTRAINT_UNIQUE_CODE == code {
+                        return Error::AlreadyExists;
+                    }
                 }
+                Error::UnknownSql(err)
             }
+            sqlx::Error::RowNotFound => Error::NotFound,
+            _ => Error::UnknownSql(err),
         }
-
-        Error::UnknownSql(err)
     }
 }

@@ -54,7 +54,7 @@ def main(args):
     if args.commands:
         if args.type == 'api':
             path = os.path.join(repo_root, SERVER_RELATIVE_PATH)
-        else if args.type == 'database':
+        elif args.type == 'database':
             path = database_path
         else:
             print(f"Unknown type {args.type}")

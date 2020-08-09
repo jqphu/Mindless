@@ -1,11 +1,15 @@
 use crate::connection::Connection;
 use crate::error::{Error, Result};
+use serde::Serialize;
 use sqlx::Done;
 
 /// This is a struct representing a user.
 ///
 /// It abstracts the sql queries away.
-#[derive(Debug)]
+///
+/// We temporarily make this Serialize since we re-use this as the http rseponse. As the database
+/// structure and the http query starts to diverge we will create a separate struct.
+#[derive(Debug, Serialize)]
 pub struct User {
     /// The user id.
     id: i64,
@@ -15,6 +19,26 @@ pub struct User {
 }
 
 impl User {
+    pub fn new(id: i64, name: String) -> User {
+        User { id, name }
+    }
+    /// Retrieve a user in the database by id.
+    pub async fn retrieve(id: i64, connection: &Connection) -> Result<User> {
+        let done = sqlx::query!(
+            r#"
+                SELECT name FROM users
+                WHERE id = ( ? )
+            "#,
+            id
+        )
+        .fetch_one(connection.get_pool())
+        .await?;
+
+        Ok(User {
+            id,
+            name: done.name,
+        })
+    }
     /// Insert a user in the database
     pub async fn insert(name: &str, connection: &Connection) -> Result<User> {
         sqlx::query!(
@@ -198,5 +222,38 @@ mod tests {
         User::insert(name, &connection)
             .await
             .expect("Should successfully insert since name has changed.");
+    }
+
+    #[tokio::test]
+    async fn retrieve_user() {
+        let connection = Connection::connect_temporary_with_schema()
+            .await
+            .expect("Should connect");
+
+        let name = "Justin";
+        let result = User::insert(name, &connection)
+            .await
+            .expect("Should successfully insert. ");
+        assert_eq!(result.name, name);
+
+        let id = result.id;
+
+        let user = User::retrieve(id, &connection)
+            .await
+            .expect("Should be able to retrieve just inserted user.");
+        assert_eq!(user.name, name);
+    }
+
+    #[tokio::test]
+    async fn fail_to_retrieve_user() {
+        let connection = Connection::connect_temporary_with_schema()
+            .await
+            .expect("Should connect");
+
+        let result = User::retrieve(123584, &connection).await;
+        assert_eq!(
+            result.expect_err("Should not be able to retrieve invalid id"),
+            crate::error::Error::NotFound
+        );
     }
 }
