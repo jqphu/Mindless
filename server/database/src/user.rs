@@ -1,5 +1,5 @@
 use crate::connection::Connection;
-use crate::error::Result;
+use crate::error::{Error, Result};
 
 /// This is a struct representing a user.
 ///
@@ -7,10 +7,10 @@ use crate::error::Result;
 #[derive(Debug)]
 pub struct User {
     /// The user id.
-    pub id: i32,
+    id: i32,
 
     /// The name of this user.
-    pub name: String,
+    name: String,
 }
 
 impl User {
@@ -50,6 +50,32 @@ impl User {
         User::get(name, connection).await
     }
 
+    /// Delete a user from the database.
+    ///
+    /// This consumes self since it is invalid after deletion from the database.
+    pub async fn delete(self, connection: &Connection) -> Result<()> {
+        // We don't have to use both identifiers but we do anyway for safety.
+        let deleted_row_count = sqlx::query!(
+            r#"
+                DELETE FROM users
+                WHERE
+                id = ( ? )
+                AND
+                name = ( ? )
+            "#,
+            self.id,
+            self.name
+        )
+        .execute(connection.get_pool())
+        .await?;
+
+        if deleted_row_count == 0 {
+            Err(Error::NotFound)
+        } else {
+            Ok(())
+        }
+    }
+
     /// Create a new connection to the database representing a user.
     ///
     /// # Examples
@@ -78,6 +104,26 @@ mod tests {
             .expect("Should successfully insert. ");
 
         assert_eq!(result.name, name);
+    }
+
+    #[tokio::test]
+    async fn delete_user() {
+        let connection = Connection::connect_temporary_with_schema()
+            .await
+            .expect("Should connect");
+
+        let name = "Justin";
+        let user = User::insert(&name, &connection)
+            .await
+            .expect("Should successfully insert. ");
+
+        user.delete(&connection)
+            .await
+            .expect("Can delete newly added user.");
+
+        User::insert(&name, &connection)
+            .await
+            .expect("Can add the user again.");
     }
 
     #[tokio::test]

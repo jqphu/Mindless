@@ -11,6 +11,9 @@ pub enum Error {
     // Field already exists in SQL database.
     AlreadyExists,
 
+    // Field could not be found.
+    NotFound,
+
     // Some sql error occurred.
     UnknownSql(sqlx::Error),
 }
@@ -34,6 +37,7 @@ impl Eq for Error {}
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
+            Error::NotFound => write!(f, "Not found."),
             Error::AlreadyExists => write!(f, "Already exists."),
             Error::UnknownSql(ref e) => write!(f, "Unknown SQL error: \"{}\"", e),
         }
@@ -43,11 +47,11 @@ impl fmt::Display for Error {
 impl error::Error for Error {
     fn source(&self) -> Option<&(dyn error::Error + 'static)> {
         match *self {
-            Error::AlreadyExists => None,
             // The cause is the underlying implementation error type. Is implicitly
             // cast to the trait object `&error::Error`. This works because the
             // underlying type already implements the `Error` trait.
             Error::UnknownSql(ref e) => Some(e),
+            _ => None,
         }
     }
 }
