@@ -8,13 +8,29 @@
 # To enable this hook, rename this file to "pre-commit".
 set -e
 
-# Assume CWD is project root aka mindless/...
-git diff --cached --name-only | if grep --quiet "server/api/data/Mindless.sql"
-then
-  hooks/validate_schema.sh || exit 1
-fi
+# TODO: Figure out how to capture output and print it. 
+function verify_call {
+  eval $1
+  status=$?
 
-git diff --cached --name-only | if grep --quiet "server/database"
+  if [ $status -ne 0 ];
+  then
+    echo "Ran \"$1\":"
+    echo "Status code is: $status"
+    exit $status
+  fi
+}
+
+cargo_wrap_file="server/scripts/cargo_wrap"
+
+git diff --cached --name-only | if grep --quiet "server"
 then
-  hooks/pre-commit_database.sh || exit 1
+  # Format files
+  # Build & Run Tests
+  verify_call "$cargo_wrap_file --type 'api' test"
+  verify_call "$cargo_wrap_file --type 'database' test"
+
+  # Run Clippy
+  verify_call "$cargo_wrap_file --type 'api' clippy"
+  verify_call "$cargo_wrap_file --type 'database' clippy"
 fi

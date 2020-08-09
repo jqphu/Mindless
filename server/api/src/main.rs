@@ -3,27 +3,18 @@
 #[macro_use]
 extern crate rocket;
 extern crate chrono;
-extern crate dotenv;
 
 extern crate serde;
 extern crate serde_json;
 
-use sqlx::SqlitePool;
+// Database queries.
+extern crate database;
 
 // List of all the routes.
 mod routes;
 
-// Database queries.
-mod database;
-
-#[cfg(test)]
-mod tests;
-
 #[tokio::main]
 async fn main() {
-    // Read the environment variables from .env file.
-    dotenv::dotenv().ok();
-
     let database_url =
         &std::env::var("DATABASE_URL").expect("`DATBASE_URL` environment variable must be set.");
 
@@ -40,13 +31,10 @@ async fn main() {
 pub async fn liftoff(database_url: &str) -> rocket::Rocket {
     rocket::ignite()
         .manage(
-            SqlitePool::new(database_url)
+            database::connection::Connection::connect(database_url)
                 .await
-                .expect("SqlitePool must be creatable."),
+                .expect("Should connect to database."),
         )
-        .mount(
-            "/",
-            routes![routes::index, routes::favicon, routes::habit, routes::user],
-        )
+        .mount("/", routes![routes::index, routes::favicon])
         .register(catchers![routes::not_found])
 }

@@ -9,6 +9,7 @@ import subprocess
 from typing import List, Optional
 
 DATABASE_RELATIVE_PATH = 'server/database'
+SERVER_RELATIVE_PATH = 'server/api'
 SCHEMA_FILE_NAME = 'mindless.sql'
 
 def get_git_root():
@@ -35,8 +36,8 @@ def setup_temporary_database(data_path: str, database_name: str):
     connection.commit()
     connection.close()
 
-def run_cargo_command(database_path: str, command: List[str]):
-    cargo_toml_path = os.path.join(database_path, "Cargo.toml")
+def run_cargo_command(server_path: str, command: List[str]):
+    cargo_toml_path = os.path.join(server_path, "Cargo.toml")
     command = ["cargo"] + command + ["--manifest-path", cargo_toml_path]
     print(f"Running command {' '.join(command)}")
     subprocess.run(command, check=True)
@@ -46,14 +47,21 @@ def main(args):
     print(f'Running build script with git root at {repo_root}')
 
     database_path = os.path.join(repo_root, DATABASE_RELATIVE_PATH)
-
     data_path = os.path.join(database_path, "data")
     print(f'Resetting database at {data_path}');
     setup_temporary_database(data_path, "temporary.db")
 
     if args.commands:
-        print(f'Building cargo');
-        run_cargo_command(database_path, args.commands)
+        if args.type == 'api':
+            path = os.path.join(repo_root, SERVER_RELATIVE_PATH)
+        else if args.type == 'database':
+            path = database_path
+        else:
+            print(f"Unknown type {args.type}")
+            raise
+
+        print(f'Building cargo {path}');
+        run_cargo_command(path, args.commands)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -65,6 +73,9 @@ if __name__ == '__main__':
 
     parser.add_argument('commands', type=str, nargs='*',
                    help='Command to tell cargo to run')
+
+    parser.add_argument('--type', type=str,
+                   help="Type of build. 'api' or 'database'")
 
     args = parser.parse_args()
 
