@@ -40,13 +40,12 @@ impl Connection {
     /// Connect to an in memory database also loading the schema.
     #[cfg(test)]
     pub async fn connect_temporary_with_schema() -> Result<Self> {
-        let pool = Connection::connect("sqlite::").await?;
-        let connection = pool.acquire().await?;
+        let connection = Connection::connect("sqlite::").await?;
 
         sqlx::query_file!("data/mindless.sql")
-            .execute(connection)
+            .execute(connection.get_pool())
             .await?;
 
-        Ok(pool)
+        Ok(connection)
     }
 }

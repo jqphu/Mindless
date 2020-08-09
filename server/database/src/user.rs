@@ -14,8 +14,8 @@ pub struct User {
 }
 
 impl User {
-    /// Get the id given a name.
-    async fn get_id(name: &str, connection: &Connection) -> Result<i32> {
+    /// Get the user given a name. This user must exist.
+    async fn get(name: &str, connection: &Connection) -> Result<User> {
         let result = sqlx::query!(
             r#"
     SELECT id FROM users WHERE name=?
@@ -25,9 +25,14 @@ impl User {
         .fetch_one(connection.get_pool())
         .await?;
 
-        Ok(result
+        let id = result
             .id
-            .expect("Should exists since this field is NON NULL."))
+            .expect("Should exists since this field is NON NULL.");
+
+        Ok(User {
+            id,
+            name: name.to_string(),
+        })
     }
 
     /// Insert a user in the database
@@ -42,12 +47,7 @@ impl User {
         .execute(connection.get_pool())
         .await?;
 
-        let user_id = User::get_id(name, connection).await?;
-
-        Ok(User {
-            id: user_id,
-            name: name.to_string(),
-        })
+        User::get(name, connection).await
     }
 
     /// Create a new connection to the database representing a user.
