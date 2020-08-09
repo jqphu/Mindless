@@ -1,9 +1,6 @@
 use crate::connection::Connection;
 use crate::error::Result;
 
-use sqlx::pool::PoolConnection;
-use sqlx::SqliteConnection;
-
 /// This is a struct representing a user.
 ///
 /// It abstracts the sql queries away.
@@ -18,14 +15,14 @@ pub struct User {
 
 impl User {
     /// Get the id given a name.
-    async fn get_id(name: &str, connection: &mut PoolConnection<SqliteConnection>) -> Result<i32> {
+    async fn get_id(name: &str, connection: &Connection) -> Result<i32> {
         let result = sqlx::query!(
             r#"
     SELECT id FROM users WHERE name=?
             "#,
             name
         )
-        .fetch_one(connection)
+        .fetch_one(connection.get_pool())
         .await?;
 
         Ok(result
@@ -34,9 +31,7 @@ impl User {
     }
 
     /// Insert a user in the database
-    pub async fn insert(name: &str, pool: &Connection) -> Result<User> {
-        let mut connection = pool.acquire().await?;
-
+    pub async fn insert(name: &str, connection: &Connection) -> Result<User> {
         sqlx::query!(
             r#"
                 INSERT INTO users ( name )
@@ -44,10 +39,10 @@ impl User {
             "#,
             name
         )
-        .execute(&mut connection)
+        .execute(connection.get_pool())
         .await?;
 
-        let user_id = User::get_id(name, &mut connection).await?;
+        let user_id = User::get_id(name, connection).await?;
 
         Ok(User {
             id: user_id,

@@ -1,6 +1,5 @@
 use crate::error::Result;
-use sqlx::pool::PoolConnection;
-use sqlx::{SqliteConnection, SqlitePool};
+use sqlx::SqlitePool;
 
 /// A simple database abstraction which contains the db info.
 ///
@@ -34,8 +33,8 @@ impl Connection {
     }
 
     /// Acquire a single connection to the database.
-    pub async fn acquire(&self) -> Result<PoolConnection<SqliteConnection>> {
-        Ok(self.pool.acquire().await?)
+    pub fn get_pool(&self) -> &SqlitePool {
+        &self.pool
     }
 
     /// Connect to an in memory database also loading the schema.
