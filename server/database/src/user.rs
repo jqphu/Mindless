@@ -15,27 +15,6 @@ pub struct User {
 }
 
 impl User {
-    /// Get the user given a name. This user must exist.
-    async fn get(name: &str, connection: &Connection) -> Result<User> {
-        let result = sqlx::query!(
-            r#"
-    SELECT id FROM users WHERE name=?
-            "#,
-            name
-        )
-        .fetch_one(connection.get_pool())
-        .await?;
-
-        let id = result
-            .id
-            .expect("Should exists since this field is NON NULL.");
-
-        Ok(User {
-            id,
-            name: name.to_string(),
-        })
-    }
-
     /// Insert a user in the database
     pub async fn insert(name: &str, connection: &Connection) -> Result<User> {
         sqlx::query!(
@@ -70,13 +49,56 @@ impl User {
         .execute(connection.get_pool())
         .await?;
 
-        println!("deleted_row_count {:#?}", deleted_row_count);
-
         if deleted_row_count.rows_affected() == 0 {
             Err(Error::NotFound)
         } else {
             Ok(())
         }
+    }
+
+    /// Set the name to a new value.
+    ///
+    /// This does not get comitted into the database until update is called.
+    pub fn set_name(&mut self, name: String) {
+        self.name = name;
+    }
+
+    pub async fn update(&mut self, connection: &Connection) -> Result<()> {
+        sqlx::query!(
+            r#"
+                UPDATE users
+                SET name = ( ? )
+                WHERE
+                id = ( ? )
+            "#,
+            self.name,
+            self.id
+        )
+        .execute(connection.get_pool())
+        .await?;
+
+        Ok(())
+    }
+
+    /// Get the user given a name. This user must exist.
+    async fn get(name: &str, connection: &Connection) -> Result<User> {
+        let result = sqlx::query!(
+            r#"
+    SELECT id FROM users WHERE name=?
+            "#,
+            name
+        )
+        .fetch_one(connection.get_pool())
+        .await?;
+
+        let id = result
+            .id
+            .expect("Should exists since this field is NON NULL.");
+
+        Ok(User {
+            id,
+            name: name.to_string(),
+        })
     }
 }
 
@@ -152,5 +174,29 @@ mod tests {
             result.expect_err("Should fail due to not existing."),
             crate::error::Error::NotFound
         );
+    }
+
+    #[tokio::test]
+    async fn update_user() {
+        let connection = Connection::connect_temporary_with_schema()
+            .await
+            .expect("Should connect");
+
+        let name = "Justin";
+        let mut user = User::insert(name, &connection)
+            .await
+            .expect("Should successfully insert. ");
+        assert_eq!(user.name, name);
+
+        user.set_name("James".to_string());
+
+        user.update(&connection)
+            .await
+            .expect("Update should succeed.");
+
+        // Can insert original user again.
+        User::insert(name, &connection)
+            .await
+            .expect("Should successfully insert since name has changed.");
     }
 }
