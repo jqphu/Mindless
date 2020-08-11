@@ -1,0 +1,4 @@
+#Mon Aug 10 21:25:59 PDT 2020
+base.0=/home/justin/projects/mindless/appv2/build/app/intermediates/dex/debug/mergeDexDebug/out/classes.dex
+path.0=classes.dex
+renamed.0=classes.dex

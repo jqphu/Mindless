@@ -1,0 +1,82 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.example.mdc_101_flutter"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="16"
+8-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml
+9        android:targetSdkVersion="28" />
+9-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml
+10
+11    <!--
+12         The INTERNET permission is required for development. Specifically,
+13         flutter needs it to communicate with the running application
+14         to allow setting breakpoints, to provide hot reload, etc.
+15    -->
+16    <uses-permission android:name="android.permission.INTERNET" />
+16-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:8:5-66
+16-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:8:22-64
+17    <!--
+18     io.flutter.app.FlutterApplication is an android.app.Application that
+19         calls FlutterMain.startInitialization(this); in its onCreate method.
+20         In most cases you can leave this as-is, but you if you want to provide
+21         additional functionality it is fine to subclass or reimplement
+22         FlutterApplication and put your custom class here.
+23    -->
+24    <application
+24-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:15:5-39:19
+25        android:name="io.flutter.app.FlutterApplication"
+25-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:16:9-57
+26        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+26-->[androidx.core:core:1.1.0] /home/justin/.gradle/caches/transforms-2/files-2.1/a528b13ac93e64cafa3d0480e2c93207/core-1.1.0/AndroidManifest.xml:24:18-86
+27        android:debuggable="true"
+28        android:icon="@mipmap/ic_launcher"
+28-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:18:9-43
+29        android:label="@string/shr_app_name"
+29-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:17:9-45
+30        android:roundIcon="@mipmap/ic_launcher_round" >
+30-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:19:9-54
+31        <activity
+31-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:20:9-38:20
+32            android:name="com.example.mdc100series.MainActivity"
+32-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:21:13-41
+33            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
+33-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:24:13-137
+34            android:hardwareAccelerated="true"
+34-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:25:13-47
+35            android:launchMode="singleTop"
+35-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:22:13-43
+36            android:theme="@style/LaunchTheme"
+36-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:23:13-47
+37            android:windowSoftInputMode="adjustResize" >
+37-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:26:13-55
+38
+39            <!--
+40                 This keeps the window background of the activity showing
+41                 until Flutter renders its first frame. It can be removed if
+42                 there is no splash screen (such as the default splash screen
+43                 defined in @style/LaunchTheme).
+44            -->
+45            <meta-data
+45-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:31:13-33:40
+46                android:name="io.flutter.app.android.SplashScreenUntilFirstFrame"
+46-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:32:17-82
+47                android:value="true" />
+47-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:33:17-37
+48
+49            <intent-filter>
+49-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:34:13-37:29
+50                <action android:name="android.intent.action.MAIN" />
+50-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:35:17-68
+50-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:35:25-66
+51
+52                <category android:name="android.intent.category.LAUNCHER" />
+52-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:36:17-76
+52-->/home/justin/projects/mindless/appv2/android/app/src/main/AndroidManifest.xml:36:27-74
+53            </intent-filter>
+54        </activity>
+55    </application>
+56
+57</manifest>
