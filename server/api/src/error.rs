@@ -1,3 +1,4 @@
+use database::error::Error as DBError;
 use rocket::http::{ContentType, Status};
 use rocket::response::{self, Responder, Response};
 use rocket::Request;
@@ -10,26 +11,33 @@ pub type Result<T> = std::result::Result<T, Error>;
 /// Simple wrapping type to implement the Responder trait on.
 #[derive(Debug)]
 pub enum Error {
-    Database(database::error::Error),
+    Database(DBError),
 }
 
 /// Error responder!
 impl<'r> Responder<'r, 'static> for Error {
     fn respond_to(self, request: &'r Request<'_>) -> response::Result<'static> {
-        println!("Error is: {:#?}", &self);
+        match self {
+            Error::Database(error) => match &error {
+                DBError::UnknownSql(_) => {
+                    let body = format!("Error: {:#?}\nRequest: {:#?}", error, request,);
 
-        let body = format!("Error: {:#?}\nRequest: {:#?}", self, request,);
-
-        Response::build()
-            .sized_body(body.len(), Cursor::new(body))
-            .status(Status::InternalServerError)
-            .header(ContentType::Plain)
-            .ok()
+                    Response::build()
+                        .sized_body(body.len(), Cursor::new(body))
+                        .status(Status::InternalServerError)
+                        .header(ContentType::Plain)
+                        .ok()
+                }
+                _ => json!({"error": error.to_string()}).respond_to(request),
+            },
+        }
+        //
+        //    }
     }
 }
 
-impl From<database::error::Error> for Error {
-    fn from(error: database::error::Error) -> Self {
+impl From<DBError> for Error {
+    fn from(error: DBError) -> Self {
         Error::Database(error)
     }
 }

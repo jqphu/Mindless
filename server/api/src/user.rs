@@ -10,13 +10,13 @@ use crate::error::Result;
 #[derive(Deserialize, Debug)]
 pub enum Request {
     // Create a user.
-    Create { name: String },
+    Create { username: String, name: String },
 
     // Delete a user.
     Delete { id: i64 },
 
     // Update a user.
-    Update { id: i64, name: String },
+    Update { user: User },
 }
 
 #[derive(Serialize, Debug)]
@@ -35,8 +35,8 @@ pub async fn user(
     request: Json<Request>,
 ) -> Result<Json<Response>> {
     match request.into_inner() {
-        Request::Create { name } => {
-            let user = User::insert(&name, &connection).await?;
+        Request::Create { username, name } => {
+            let user = User::insert(&username, &name, &connection).await?;
             Ok(Json(Response::Create { user }))
         }
 
@@ -49,8 +49,7 @@ pub async fn user(
             Ok(Json(Response::Delete))
         }
 
-        Request::Update { id, name } => {
-            let mut user = User::new(id, name);
+        Request::Update { mut user } => {
             user.update(&connection).await?;
 
             Ok(Json(Response::Update { user }))

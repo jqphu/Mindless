@@ -1,6 +1,6 @@
 use crate::connection::Connection;
 use crate::error::{Error, Result};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use sqlx::Done;
 
 /// This is a struct representing a user.
@@ -9,24 +9,28 @@ use sqlx::Done;
 ///
 /// We temporarily make this Serialize since we re-use this as the http rseponse. As the database
 /// structure and the http query starts to diverge we will create a separate struct.
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct User {
     /// The user id.
     id: i64,
 
-    /// The name of this user.
+    /// Username.
+    username: String,
+
+    /// Name
     name: String,
 }
 
 impl User {
-    pub fn new(id: i64, name: String) -> User {
-        User { id, name }
+    pub fn new(id: i64, username: String, name: String) -> User {
+        User { id, username, name }
     }
+
     /// Retrieve a user in the database by id.
     pub async fn retrieve(id: i64, connection: &Connection) -> Result<User> {
         let done = sqlx::query!(
             r#"
-                SELECT name FROM users
+                SELECT username, name FROM users
                 WHERE id = ( ? )
             "#,
             id
@@ -36,38 +40,43 @@ impl User {
 
         Ok(User {
             id,
+            username: done.username,
             name: done.name,
         })
     }
     /// Insert a user in the database
-    pub async fn insert(name: &str, connection: &Connection) -> Result<User> {
+    pub async fn insert(username: &str, name: &str, connection: &Connection) -> Result<User> {
         sqlx::query!(
             r#"
-                INSERT INTO users ( name )
-                VALUES ( ? )
+                INSERT INTO users ( username, name )
+                VALUES ( ?, ? )
             "#,
+            username,
             name
         )
         .execute(connection.get_pool())
         .await?;
 
-        User::get(name, connection).await
+        User::get(username, connection).await
     }
 
     /// Delete a user from the database.
     ///
     /// This consumes self since it is invalid after deletion from the database.
     pub async fn delete(self, connection: &Connection) -> Result<()> {
-        // We don't have to use both identifiers but we do anyway for safety.
+        //  We really only need the id but we use everything to be specific.
         let deleted_row_count = sqlx::query!(
             r#"
                 DELETE FROM users
                 WHERE
                 id = ( ? )
                 AND
+                username = ( ? )
+                AND
                 name = ( ? )
             "#,
             self.id,
+            self.username,
             self.name
         )
         .execute(connection.get_pool())
@@ -87,14 +96,23 @@ impl User {
         self.name = name;
     }
 
+    /// Set the username to a new value.
+    ///
+    /// This does not get comitted into the database until update is called.
+    pub fn set_username(&mut self, username: String) {
+        self.username = username;
+    }
+
     pub async fn update(&mut self, connection: &Connection) -> Result<()> {
         sqlx::query!(
             r#"
                 UPDATE users
-                SET name = ( ? )
+                SET username = ( ? ),
+                    name = ( ? )
                 WHERE
                 id = ( ? )
             "#,
+            self.username,
             self.name,
             self.id
         )
@@ -104,13 +122,13 @@ impl User {
         Ok(())
     }
 
-    /// Get the user given a name. This user must exist.
-    async fn get(name: &str, connection: &Connection) -> Result<User> {
+    /// Get the user given a username. This user must exist.
+    async fn get(username: &str, connection: &Connection) -> Result<User> {
         let result = sqlx::query!(
             r#"
-    SELECT id FROM users WHERE name=?
+    SELECT id, name FROM users WHERE username=?
             "#,
-            name
+            username
         )
         .fetch_one(connection.get_pool())
         .await?;
@@ -119,10 +137,9 @@ impl User {
             .id
             .expect("Should exists since this field is NON NULL.");
 
-        Ok(User {
-            id,
-            name: name.to_string(),
-        })
+        let name = result.name;
+
+        Ok(User::new(id, username.to_string(), name))
     }
 }
 
@@ -136,11 +153,13 @@ mod tests {
             .await
             .expect("Should connect");
 
+        let username = "justin_username";
         let name = "Justin";
-        let result = User::insert(name, &connection)
+        let result = User::insert(username, name, &connection)
             .await
             .expect("Should successfully insert. ");
 
+        assert_eq!(result.username, username);
         assert_eq!(result.name, name);
     }
 
@@ -150,14 +169,15 @@ mod tests {
             .await
             .expect("Should connect");
 
+        let username = "duplicate_username";
         let name = "DuplicateUser";
-        let result = User::insert(name, &connection)
+        let result = User::insert(username, name, &connection)
             .await
             .expect("Should successfully insert.");
+        assert_eq!(result.username, username);
         assert_eq!(result.name, name);
 
-        let name = "DuplicateUser";
-        let result = User::insert(name, &connection).await;
+        let result = User::insert(username, name, &connection).await;
 
         assert_eq!(
             result.expect_err("Should have failed due to duplication."),
@@ -171,8 +191,9 @@ mod tests {
             .await
             .expect("Should connect");
 
+        let username = "JustinUserName";
         let name = "Justin";
-        let user = User::insert(&name, &connection)
+        let user = User::insert(username, name, &connection)
             .await
             .expect("Should successfully insert. ");
 
@@ -189,7 +210,8 @@ mod tests {
 
         let user = User {
             id: 123,
-            name: "hello".to_string(),
+            name: "justin".to_string(),
+            username: "hello".to_string(),
         };
 
         let result = user.delete(&connection).await;
@@ -206,22 +228,34 @@ mod tests {
             .await
             .expect("Should connect");
 
-        let name = "Justin";
-        let mut user = User::insert(name, &connection)
+        let username = "Justin";
+        let name = "name";
+        let mut user = User::insert(username, name, &connection)
             .await
             .expect("Should successfully insert. ");
+        assert_eq!(user.username, username);
         assert_eq!(user.name, name);
 
-        user.set_name("James".to_string());
+        let new_username = "James";
+        let new_name = "Foo";
+        user.set_username(new_username.to_string());
+        user.set_name(new_name.to_string());
 
         user.update(&connection)
             .await
             .expect("Update should succeed.");
 
-        // Can insert original user again.
-        User::insert(name, &connection)
+        // Let's try extract the updated user.
+        let new_user = User::retrieve(user.id, &connection)
             .await
-            .expect("Should successfully insert since name has changed.");
+            .expect("User should exist.");
+        assert_eq!(new_user.username, new_username);
+        assert_eq!(new_user.name, new_name);
+
+        // Can insert original user again.
+        User::insert(username, name, &connection)
+            .await
+            .expect("Should successfully insert since username has changed.");
     }
 
     #[tokio::test]
@@ -230,10 +264,12 @@ mod tests {
             .await
             .expect("Should connect");
 
-        let name = "Justin";
-        let result = User::insert(name, &connection)
+        let username = "Justin";
+        let name = "name";
+        let result = User::insert(username, name, &connection)
             .await
             .expect("Should successfully insert. ");
+        assert_eq!(result.username, username);
         assert_eq!(result.name, name);
 
         let id = result.id;
@@ -241,6 +277,7 @@ mod tests {
         let user = User::retrieve(id, &connection)
             .await
             .expect("Should be able to retrieve just inserted user.");
+        assert_eq!(user.username, username);
         assert_eq!(user.name, name);
     }
 

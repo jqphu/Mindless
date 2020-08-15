@@ -38,8 +38,8 @@ impl Eq for Error {}
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::NotFound => write!(f, "Not found."),
-            Error::AlreadyExists => write!(f, "Already exists."),
+            Error::NotFound => write!(f, "NotFound"),
+            Error::AlreadyExists => write!(f, "AlreadyExists"),
             Error::UnknownSql(ref e) => write!(f, "Unknown SQL error: \"{}\"", e),
         }
     }
