@@ -11,6 +11,13 @@ the steps on there!
 
 The icon is a little smaller than I'd like but we can fix that later.
 
+## Signing the app
+
+Create a keystore in hidden home directory.
+
+Manually, update some android files to sign. I assume this won't sign for iOS.
+Also have some specific depdencies on the LOCATION of the repository now which isn't ideal
+but we can work with it!
 
 
 # [2020-08-09]  01:05 - 4:22
