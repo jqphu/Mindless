@@ -31,6 +31,16 @@ However, it's hard to tell how it will look together.
 The overall goal is to go for a light and clean theme. Not too many colors, nothing too strong.
 We'll figure this one out a little more as we go.
 
+# Login page
+
+Let's start building the login page.
+
+Let's try to think how we can have persistent login token with the HTTP server.
+This would require setting up our own authentication or using firebase and authenticating the token.
+I'm going to hopefully write the code in a way that when we switch to using firebase or a proper
+authentication it should be simply to insert. For now, we use shared local storage to see if the
+user is already logged in. 
+
 # [2020-08-09]  01:05 - 4:22
 Yeah, what a strange time to get started. I guess we can call this a hackathon :).
 
