@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 import 'login/login.dart';
 
+const kColorBrown = const Color(0xFF442B2D);
+
 ThemeData _buildMindlessTheme() {
   return ThemeData(
-    primaryColor: Color(0xFFF1FAEE),
-    accentColor: Color(0xFFF7EEFA),
-    errorColor: Color(0xFFE63947),
-    fontFamily: 'Rubik',
-  );
+      primaryColor: Color(0xFFF1FAEE),
+      accentColor: Color(0xFFF7EEFA),
+      errorColor: Color(0xFFE63947),
+      textTheme: ThemeData.light().textTheme.apply(
+          fontFamily: 'Rubik',
+          displayColor: kColorBrown,
+          bodyColor: kColorBrown));
 }
 
 class Mindless extends StatelessWidget {
