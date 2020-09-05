@@ -19,6 +19,17 @@ Manually, update some android files to sign. I assume this won't sign for iOS.
 Also have some specific depdencies on the LOCATION of the repository now which isn't ideal
 but we can work with it!
 
+# Colors
+
+We probably want to just stick to Material themeing and coloring. The only problem is I have no idea
+how to color an app.
+
+Reading: https://material.io/design/color/the-color-system.html#color-theme-creation made some sense
+and found some color pallets which I [found nice](https://coolors.co/palettes/trending).
+However, it's hard to tell how it will look together.
+
+The overall goal is to go for a light and clean theme. Not too many colors, nothing too strong.
+We'll figure this one out a little more as we go.
 
 # [2020-08-09]  01:05 - 4:22
 Yeah, what a strange time to get started. I guess we can call this a hackathon :).
