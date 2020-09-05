@@ -1,3 +1,18 @@
+# [2020-09-04] 20:50
+
+Goal to start actually comitting out app code.
+
+Goal: Get a production demo app following https://flutter.dev/docs/deployment/android
+
+## Adding a launcher icon
+
+Using [flutter_launcher_icons](https://pub.dev/packages/flutter_launcher_icons) and follow
+the steps on there!
+
+The icon is a little smaller than I'd like but we can fix that later.
+
+
+
 # [2020-08-09]  01:05 - 4:22
 Yeah, what a strange time to get started. I guess we can call this a hackathon :).
 
