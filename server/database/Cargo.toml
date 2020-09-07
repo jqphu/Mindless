@@ -11,7 +11,7 @@ anyhow = "1.0.31"
 
 [dependencies.sqlx]
 version = "0.4.0-beta.1"
-features = ["sqlite"]
+features = ["sqlite", "chrono"]
 
 # Used to test our async functions.
 [dev-dependencies.tokio]
@@ -21,3 +21,7 @@ features = ["macros", "rt-threaded"]
 [dependencies.serde]
 version = "1.0"
 features = ["derive"]
+
+[dependencies.chrono]
+version = "0.4.15"
+features = ["serde"]

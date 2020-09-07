@@ -24,6 +24,7 @@ def setup_temporary_database(data_path: str, database_name: str):
       os.remove(database_path)
 
     os.environ['DATABASE_URL'] = f'sqlite:///{database_path}'
+    print(os.environ['DATABASE_URL'])
 
     # Create a temporary database which will last until this script ends.
     connection = sqlite3.connect(database_path)

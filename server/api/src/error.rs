@@ -17,7 +17,7 @@ pub enum Error {
 /// Error responder!
 impl<'r> Responder<'r, 'static> for Error {
     fn respond_to(self, request: &'r Request<'_>) -> response::Result<'static> {
-        match self {
+        let response = match &self {
             Error::Database(error) => match &error {
                 DBError::UnknownSql(_) => {
                     let body = format!("Error: {:#?}\nRequest: {:#?}", error, request,);
@@ -30,9 +30,14 @@ impl<'r> Responder<'r, 'static> for Error {
                 }
                 _ => json!({"error": error.to_string()}).respond_to(request),
             },
-        }
-        //
-        //    }
+        };
+
+        println!(
+            "Responding with error: {:#?}\nfrom request: {:#?}",
+            &response, &request
+        );
+
+        response
     }
 }
 

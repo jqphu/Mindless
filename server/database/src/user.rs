@@ -26,6 +26,10 @@ impl User {
         User { id, username, name }
     }
 
+    pub fn get_id(&self) -> i64 {
+        self.id
+    }
+
     /// Retrieve a user in the database by id.
     pub async fn retrieve(id: i64, connection: &Connection) -> Result<User> {
         let done = sqlx::query!(
@@ -44,6 +48,7 @@ impl User {
             name: done.name,
         })
     }
+
     /// Insert a user in the database
     pub async fn insert(username: &str, name: &str, connection: &Connection) -> Result<User> {
         sqlx::query!(
@@ -123,7 +128,7 @@ impl User {
     }
 
     /// Get the user given a username. This user must exist.
-    async fn get(username: &str, connection: &Connection) -> Result<User> {
+    pub async fn get(username: &str, connection: &Connection) -> Result<User> {
         let result = sqlx::query!(
             r#"
     SELECT id, name FROM users WHERE username=?

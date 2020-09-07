@@ -1,4 +1,5 @@
 #![feature(proc_macro_hygiene)]
+#![feature(async_closure)]
 
 #[macro_use]
 extern crate rocket;
@@ -14,10 +15,10 @@ extern crate database;
 
 // List of common routes.
 mod routes;
-
 // User routes
 mod user;
-
+// Task routes
+mod task;
 // Errors
 mod error;
 
@@ -43,6 +44,9 @@ pub async fn liftoff(database_url: &str) -> rocket::Rocket {
                 .await
                 .expect("Should connect to database."),
         )
-        .mount("/", routes![routes::index, routes::favicon, user::user])
+        .mount(
+            "/",
+            routes![routes::index, routes::favicon, user::user, task::task],
+        )
         .register(catchers![routes::not_found])
 }

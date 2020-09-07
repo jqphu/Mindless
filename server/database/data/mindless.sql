@@ -9,7 +9,39 @@ CREATE TABLE IF NOT EXISTS users (
   name TEXT NOT NULL,
 
   -- Ensure the usernames are unique.
-  CONSTRAINT unique_username UNIQUE(name)
+  CONSTRAINT unique_username UNIQUE(username)
+);
+
+-- Representation of a task
+CREATE TABLE IF NOT EXISTS tasks (
+  id INTEGER NOT NULL PRIMARY KEY,
+  parent_id INTEGER,
+  user_id INTEGER NOT NULL,
+
+  -- Name of this task.
+  name TEXT NOT NULL,
+
+  FOREIGN KEY(user_id) REFERENCES users(id),
+  FOREIGN KEY(parent_id) REFERENCES tasks(id),
+
+  -- Ensure the task and username pair is unique.
+  CONSTRAINT unique_task_username UNIQUE(user_id, name)
+);
+
+CREATE TABLE IF NOT EXISTS instances (
+  id INTEGER NOT NULL PRIMARY KEY,
+  task_id INTEGER NOT NULL,
+
+  -- The time this period started.
+  start datetime NOT NULL,
+
+  -- The time this period completed.
+  end datetime NOT NULL,
+
+  FOREIGN KEY(task_id) REFERENCES tasks(id)
+
+  -- Ensure the task and username pair is unique.
+  CONSTRAINT unique_instance UNIQUE(task_id, start, end)
 );
 
 -- Representation of a habit

@@ -12,6 +12,9 @@ pub enum Request {
     // Create a user.
     Create { username: String, name: String },
 
+    // Login given a username
+    Login { username: String },
+
     // Delete a user.
     Delete { id: i64 },
 
@@ -22,6 +25,8 @@ pub enum Request {
 #[derive(Serialize, Debug)]
 pub enum Response {
     Create { user: User },
+
+    Login { user: User },
 
     Delete,
 
@@ -34,10 +39,17 @@ pub async fn user(
     connection: State<'_, Connection>,
     request: Json<Request>,
 ) -> Result<Json<Response>> {
-    match request.into_inner() {
+    println!("Recieved request: {:#?}", request);
+
+    let response = match request.into_inner() {
         Request::Create { username, name } => {
             let user = User::insert(&username, &name, &connection).await?;
             Ok(Json(Response::Create { user }))
+        }
+
+        Request::Login { username } => {
+            let user = User::get(&username, &connection).await?;
+            Ok(Json(Response::Login { user }))
         }
 
         Request::Delete { id } => {
@@ -54,5 +66,9 @@ pub async fn user(
 
             Ok(Json(Response::Update { user }))
         }
-    }
+    };
+
+    println!("Sending response: {:#?}", response);
+
+    response
 }
