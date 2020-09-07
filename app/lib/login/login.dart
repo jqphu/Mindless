@@ -1,21 +1,44 @@
 import 'package:flutter/material.dart';
 
+/// The login logic.
+class LoginPage extends StatefulWidget {
+  @override
+  _LoginPageState createState() => _LoginPageState();
+}
+
 /// Login page.
-class LoginPage extends StatelessWidget {
+class _LoginPageState extends State<LoginPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+
+  void _handleNextButtonPress() {
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+
+    Navigator.of(context).pushNamed('/home');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: SafeArea(
-            child: Column(children: <Widget>[
-      ListView(
-          shrinkWrap: true,
-          padding: EdgeInsets.symmetric(horizontal: 24.0),
-          children: <Widget>[
-            Title(),
-            SizedBox(height: 50),
-          ]),
-      Expanded(child: LoginField()),
-    ])));
+      body: SafeArea(
+          child: Column(children: <Widget>[
+        ListView(
+            shrinkWrap: true,
+            padding: EdgeInsets.symmetric(horizontal: 24.0),
+            children: <Widget>[
+              Title(),
+              SizedBox(height: 50),
+            ]),
+        Expanded(child: LoginField(_formKey, _usernameController)),
+      ])),
+      floatingActionButton: FloatingActionButton(
+          child: Icon(Icons.navigate_next, size: 50),
+          onPressed: () {
+            _handleNextButtonPress();
+          }),
+    );
   }
 }
 
@@ -35,17 +58,22 @@ class Title extends StatelessWidget {
 
 /// The login logic.
 class LoginField extends StatefulWidget {
+  // Form key passed in by the parent.
+  final _formKey;
+
+  // Username text controller passed in by the parent.
+  final _usernameController;
+
+  LoginField(this._formKey, this._usernameController);
+
   @override
   _LoginFieldState createState() => _LoginFieldState();
 }
 
 class _LoginFieldState extends State<LoginField> {
   // State controlling user input
-  final _usernameController = TextEditingController();
   final _unfocusedColor = Colors.grey[600];
   final _usernameFocusNode = FocusNode();
-
-  final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
@@ -59,13 +87,13 @@ class _LoginFieldState extends State<LoginField> {
   @override
   Widget build(BuildContext context) {
     return Form(
-        key: _formKey,
+        key: widget._formKey,
         child: Column(children: <Widget>[
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Column(children: <Widget>[
                 TextFormField(
-                    controller: _usernameController,
+                    controller: widget._usernameController,
                     decoration: InputDecoration(
                       labelText: 'Username',
                       labelStyle: TextStyle(
@@ -81,17 +109,6 @@ class _LoginFieldState extends State<LoginField> {
                       return null;
                     })
               ])),
-          Expanded(
-              child: Align(
-                  alignment: Alignment.bottomRight,
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: FloatingActionButton(
-                        child: Icon(Icons.navigate_next, size: 50),
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/home');
-                        }),
-                  )))
         ]));
   }
 }
