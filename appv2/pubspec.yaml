@@ -4,20 +4,35 @@ description: Learn the basics of using Material Components by building a simple 
 dependencies:
   flutter:
     sdk: flutter
-  intl: ^0.15.6
 
   cupertino_icons: ^0.1.0
+  intl: ^0.15.6
+  provider: ^4.1.1
   shrine_images: 1.1.1
+  http: ^0.12.2
+  shared_preferences: ^0.5.10
+
+  # Icon for app.
+  flutter_launcher_icons: ^0.7.4
+
+  # NFC read & write
+  nfc_in_flutter: ^2.0.5
 
 dev_dependencies:
+  pedantic: ^1.9.0
   flutter_test:
     sdk: flutter
 
 flutter:
-  # TODO: Insert Fonts (103)
+  fonts:
+    - family: Rubik
+      fonts:
+        - asset: fonts/Rubik-Regular.ttf
+        - asset: fonts/Rubik-Medium.ttf
+          weight: 500
   uses-material-design: true
   assets:
-    - assets/diamond.png
+    - assets/monkey.png
     # TODO: Add slanted menu asset (104)
     - packages/shrine_images/0-0.jpg
     - packages/shrine_images/1-0.jpg
@@ -57,3 +72,11 @@ flutter:
     - packages/shrine_images/35-0.jpg
     - packages/shrine_images/36-0.jpg
     - packages/shrine_images/37-0.jpg
+
+flutter_icons:
+  ios: true
+  android: true
+  image_path_ios: "assets/monkey.png"
+  image_path_android: "assets/monkey.png"
+  adaptive_icon_background: "assets/monkey.png"
+  adaptive_icon_foreground: "assets/monkey.png"

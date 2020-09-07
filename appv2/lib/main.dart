@@ -12,8 +12,26 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
+import 'model/user.dart';
 
 import 'package:Shrine/app.dart';
 
-void main() => runApp(ShrineApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // mandatory when awaiting on main
+
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  final name = prefs.getString('name');
+  final id = prefs.getInt('id');
+  final username = prefs.getString('username');
+  final user = User(username, name, id);
+  final taskName = prefs.getString('cur_task_name');
+  var startedTime;
+  if (taskName != null) {
+    startedTime = DateTime.parse(prefs.getString('cur_task_start_time'));
+  }
+
+  runApp(ShrineApp(name == null ? null : user,
+      taskName == null ? [null, null] : [taskName, startedTime]));
+}

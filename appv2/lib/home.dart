@@ -1,33 +1,81 @@
-// Copyright 2018-present the Flutter authors. All Rights Reserved.
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-// http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
+import 'task_list_tab.dart';
+import 'account_tab.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  // TODO: Make a collection of cards (102)
   // TODO: Add a variable for Category (104)
   @override
   Widget build(BuildContext context) {
-    // TODO: Return an AsymmetricView (104)
-    // TODO: Pass Category variable to AsymmetricView (104)
-    return Scaffold(
-      // TODO: Add app bar (102)
-      // TODO: Add a grid view (102)
-      body: Center(
-        child: Text('You did it!'),
+    // This app is designed only to work vertically, so we limit
+    // orientations to portrait up and down.
+    SystemChrome.setPreferredOrientations(
+        [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
+
+    return CupertinoApp(
+      home: CupertinoStoreHomePage(),
+    );
+  }
+}
+
+class CupertinoStoreHomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return CupertinoTabScaffold(
+      tabBar: CupertinoTabBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.home),
+            title: Text('Home'),
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(CupertinoIcons.person),
+            title: Text('Account'),
+          ),
+        ],
       ),
-      // TODO: Set resizeToAvoidBottomInset (101)
+      tabBuilder: (context, index) {
+        CupertinoTabView returnValue;
+        switch (index) {
+          case 0:
+            returnValue = CupertinoTabView(builder: (context) {
+              return CupertinoPageScaffold(
+                navigationBar: CupertinoNavigationBar(
+                    middle: Row(
+                  children: <Widget>[
+                    Image.asset('assets/monkey.png', height: 38),
+                    SizedBox(width: 10),
+                    Text('MINDLESS',
+                        // TODO THEME
+                        style: TextStyle(
+                            fontFamily: 'Rubik', fontWeight: FontWeight.w400),
+                        textScaleFactor: 1.5),
+                  ],
+                )),
+                child: TaskListTab(),
+              );
+            });
+            break;
+          case 1:
+            returnValue = CupertinoTabView(builder: (context) {
+              return CupertinoPageScaffold(
+                  navigationBar: CupertinoNavigationBar(
+                      middle: Row(children: <Widget>[
+                    Image.asset('assets/monkey.png', height: 38),
+                    SizedBox(width: 10),
+                    Text('MINDLESS',
+                        // TODO THEME
+                        style: TextStyle(
+                            fontFamily: 'Rubik', fontWeight: FontWeight.w400),
+                        textScaleFactor: 1.5),
+                  ])),
+                  child: AccountTab());
+            });
+            break;
+        }
+        return returnValue;
+      },
     );
   }
 }

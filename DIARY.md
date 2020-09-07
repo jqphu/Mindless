@@ -1,3 +1,37 @@
+# [2020-09-03] 20:40:54
+
+## 4 Day Hackathon Almost Begins
+
+Goals:
+End-To-End working NFC chip task tracking (both reading & writing).
+Maybe notes? :)
+Clean committed code :)
+
+Let's do it.
+
+# [2020-08-29]
+
+## Visualization and analysis 
+```
+scp justin@jqphu.dev:~/doc/Mindless/server/database/data/temporary.db weekly_data.db
+```
+
+TODO: Always load dummy data into the database.
+
+# [2020-08-20]  21:00-
+I think I ended up sleeping in a lot. It's hard to wake up early :P. Maybe I'll just code at night
+after work...
+
+# [2020-08-19]  05:30-
+Goal: Get a stopwatch running.
+
+Achieved:
+A basic timer is running and UI is updating. Difficulty trying to propagate the changes through the
+child widget since we cannot go through the provider.
+
+Need to fix didUpdateDependencies doing logic as opposed to simply building the widget. 
+
+
 # [2020-08-09]  01:05 - 4:22
 Yeah, what a strange time to get started. I guess we can call this a hackathon :).
 
