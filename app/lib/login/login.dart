@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'package:mindless/model/user.dart';
+
 /// The login logic.
 class LoginPage extends StatefulWidget {
   @override
@@ -10,35 +12,66 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
+  Future<User> user;
 
-  void _handleNextButtonPress() {
+  void _handleNextButtonPress() async {
+    // Request is in progress.
+    if (user != null) {
+      return;
+    }
+
+    // Validate the input
     if (!_formKey.currentState.validate()) {
       return;
     }
 
-    Navigator.of(context).pushNamed('/home');
+    setState(() {
+      user = User.login("test");
+    });
+    user.then((userValue) {
+      user = null;
+      // Navigator.of(context).pushNamed('/home');
+    });
+  }
+
+  /// Build the login field widget if we're not connecting.
+  Widget _buildLoginFieldWidget(bool connecting) {
+    if (!connecting) {
+      return Expanded(child: LoginField(_formKey, _usernameController));
+    } else {
+      return CircularProgressIndicator();
+    }
+  }
+
+  /// Build the floating action button if we're not connecting.
+  Widget _buildFloatingActionButton(bool connecting) {
+    return connecting
+        ? null
+        : FloatingActionButton(
+            child: Icon(Icons.navigate_next, size: 50),
+            onPressed: () async {
+              _handleNextButtonPress();
+            });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-          child: Column(children: <Widget>[
-        ListView(
-            shrinkWrap: true,
-            padding: EdgeInsets.symmetric(horizontal: 24.0),
-            children: <Widget>[
-              Title(),
-              SizedBox(height: 50),
-            ]),
-        Expanded(child: LoginField(_formKey, _usernameController)),
-      ])),
-      floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.navigate_next, size: 50),
-          onPressed: () {
-            _handleNextButtonPress();
-          }),
-    );
+    return FutureBuilder(
+        future: user,
+        builder: (context, snapshot) {
+          final connecting =
+              snapshot.connectionState == ConnectionState.waiting;
+
+          return Scaffold(
+              body: SafeArea(
+                  child: Column(children: <Widget>[
+                SizedBox(height: 80.0),
+                Title(),
+                SizedBox(height: 50),
+                _buildLoginFieldWidget(connecting),
+              ])),
+              floatingActionButton: _buildFloatingActionButton(connecting));
+        });
   }
 }
 
@@ -47,7 +80,6 @@ class Title extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
-      SizedBox(height: 80.0),
       Image.asset('assets/monkey.png', height: 100),
       Center(
           child:
