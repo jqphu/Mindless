@@ -4,6 +4,7 @@ import 'package:mindless/model/user.dart';
 import 'package:mindless/server.dart';
 
 import 'registration.dart';
+import 'form_field.dart';
 
 /// The login logic.
 class LoginPage extends StatefulWidget {
@@ -156,7 +157,6 @@ class LoginField extends StatefulWidget {
 
 class _LoginFieldState extends State<LoginField> {
   // State controlling user input
-  final _unfocusedColor = Colors.grey[600];
   final _usernameFocusNode = FocusNode();
 
   @override
@@ -176,22 +176,8 @@ class _LoginFieldState extends State<LoginField> {
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Column(children: <Widget>[
-                TextFormField(
-                    controller: widget._usernameController,
-                    decoration: InputDecoration(
-                      labelText: 'Username',
-                      labelStyle: TextStyle(
-                          color: _usernameFocusNode.hasFocus
-                              ? Theme.of(context).accentColor
-                              : _unfocusedColor),
-                    ),
-                    validator: (value) {
-                      if (value.isEmpty) {
-                        return "Fill me in!";
-                      }
-
-                      return null;
-                    })
+                buildFormField(context, "Username", "Fill me in!",
+                    widget._usernameController, _usernameFocusNode)
               ])),
         ]));
   }
