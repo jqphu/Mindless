@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:mindless/model/user.dart';
 import 'package:mindless/server.dart';
 
+import 'registration.dart';
+
 /// The login logic.
 class LoginPage extends StatefulWidget {
   @override
@@ -29,7 +31,8 @@ class _LoginPageState extends State<LoginPage> {
     switch (exception.error) {
       case RequestError.NotFound:
         {
-          // TODO: Go to registration page.
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => RegistrationPage()));
         }
         break;
       // Internal server error. Unexpected!
