@@ -9,6 +9,18 @@ class RegistrationPage extends StatefulWidget {
 
 /// Registration page.
 class _RegistrationPageState extends State<RegistrationPage> {
+  final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
+  final _nameController = TextEditingController();
+
+  /// Handle a request to register.
+  _handleRegister() {
+    // Validate the input
+    if (!_formKey.currentState.validate()) {
+      return;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,8 +30,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
               padding: EdgeInsets.symmetric(horizontal: 24.0),
               children: <Widget>[
             SizedBox(height: 140.0),
-            RegistrationFormField()
+            RegistrationFormField(
+                _formKey, _usernameController, _nameController)
           ])),
+      floatingActionButton: FloatingActionButton(
+          heroTag: "login",
+          child: Icon(Icons.navigate_next, size: 50),
+          onPressed: () async {
+            _handleRegister();
+          }),
     );
   }
 }
@@ -38,27 +57,41 @@ AppBar buildMonkeyBar(BuildContext context) {
 }
 
 class RegistrationFormField extends StatefulWidget {
+  // Form key passed in by the parent.
+  final _formKey;
+
+  // Username text controller passed in by the parent.
+  final _usernameController;
+
+  // Name text controller passed in by the parent.
+  final _nameController;
+
+  RegistrationFormField(
+      this._formKey, this._usernameController, this._nameController);
+
   @override
   _RegistrationFormFieldState createState() => _RegistrationFormFieldState();
 }
 
 class _RegistrationFormFieldState extends State<RegistrationFormField> {
   final _usernameFocusNode = FocusNode();
-  final _usernameController = TextEditingController();
-
   final _nameFocusNode = FocusNode();
-  final _nameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Form(
+        key: widget._formKey,
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
-      SizedBox(height: 50.0),
-      buildFormField(context, "Username", "Pick a username! Any username.",
-          _usernameController, _usernameFocusNode),
-      SizedBox(height: 10.0),
-      buildFormField(context, "Name", "Did your parents forget name you?",
-          _nameController, _nameFocusNode),
-    ]));
+          SizedBox(height: 50.0),
+          buildFormField(context, "Username", "Pick a username! Any username.",
+              widget._usernameController, _usernameFocusNode),
+          SizedBox(height: 10.0),
+          buildFormField(
+              context,
+              "Name",
+              "Did your parents forget to name you?",
+              widget._nameController,
+              _nameFocusNode),
+        ]));
   }
 }
