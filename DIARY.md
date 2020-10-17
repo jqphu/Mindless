@@ -1,3 +1,9 @@
+# [2020-10-16] 19:21
+A one month hiatus :) as always.
+
+Goals:
+* Work on login / registration page.
+
 # [2020-09-04] 20:50
 
 Goal to start actually comitting out app code.

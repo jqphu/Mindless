@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'package:mindless/model/user.dart';
+import 'package:mindless/server.dart';
 
 /// The login logic.
 class LoginPage extends StatefulWidget {
@@ -12,11 +13,53 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
-  Future<User> user;
+  Future<User> _userRequest;
+
+  // Scaffold.
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
+  void _resetState() {
+    _userRequest = null;
+    _scaffoldKey.currentState.removeCurrentSnackBar();
+  }
+
+  void _handleServerException(exception) {
+    _resetState();
+
+    switch (exception.error) {
+      case RequestError.NotFound:
+        {
+          // TODO: Go to registration page.
+        }
+        break;
+      // Internal server error. Unexpected!
+      default:
+        {
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+                "Server returned an error. Justin probably broke something!"),
+            duration: Duration(seconds: 2),
+          ));
+        }
+        break;
+    }
+  }
+
+  void _handleUnexpectedException(exception) {
+    _resetState();
+
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content:
+          Text("Something unexpected went wrong :(. Try again? $exception"),
+      duration: Duration(seconds: 2),
+    ));
+  }
 
   void _handleNextButtonPress() async {
     // Request is in progress.
-    if (user != null) {
+    if (_userRequest != null) {
       return;
     }
 
@@ -26,12 +69,20 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     setState(() {
-      user = User.login("test");
+      _userRequest = User.login(_usernameController.text);
     });
-    user.then((userValue) {
-      user = null;
-      // Navigator.of(context).pushNamed('/home');
-    });
+
+    _userRequest
+        .then((user) {
+          _userRequest = null;
+          _usernameController.clear();
+
+          Navigator.of(context).pushNamed('/home', arguments: user);
+        })
+        // Catch server errors.
+        .catchError(_handleServerException, test: (e) => e is RequestException)
+        // Catch all other errors.
+        .catchError((exception) => _handleUnexpectedException(exception));
   }
 
   /// Build the login field widget if we're not connecting.
@@ -43,34 +94,32 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  /// Build the floating action button if we're not connecting.
-  Widget _buildFloatingActionButton(bool connecting) {
-    return connecting
-        ? null
-        : FloatingActionButton(
-            child: Icon(Icons.navigate_next, size: 50),
-            onPressed: () async {
-              _handleNextButtonPress();
-            });
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: user,
+        future: _userRequest,
         builder: (context, snapshot) {
           final connecting =
               snapshot.connectionState == ConnectionState.waiting;
 
           return Scaffold(
-              body: SafeArea(
-                  child: Column(children: <Widget>[
-                SizedBox(height: 80.0),
-                Title(),
-                SizedBox(height: 50),
-                _buildLoginFieldWidget(connecting),
-              ])),
-              floatingActionButton: _buildFloatingActionButton(connecting));
+            key: _scaffoldKey,
+            body: SafeArea(
+                child: Column(children: <Widget>[
+              SizedBox(height: 80.0),
+              Title(),
+              SizedBox(height: 50),
+              _buildLoginFieldWidget(connecting),
+            ])),
+            floatingActionButton: Visibility(
+                child: FloatingActionButton(
+                    heroTag: "test",
+                    child: Icon(Icons.navigate_next, size: 50),
+                    onPressed: () async {
+                      _handleNextButtonPress();
+                    }),
+                visible: !connecting),
+          );
         });
   }
 }

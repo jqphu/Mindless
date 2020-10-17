@@ -35,6 +35,11 @@ ThemeData _buildMindlessTheme() {
       border: OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(7.0))),
     ),
+    snackBarTheme: SnackBarThemeData(
+      backgroundColor: kColorPrimary,
+      contentTextStyle: TextStyle(color: kColorBrown),
+      elevation: 6,
+    ),
   );
 }
 
