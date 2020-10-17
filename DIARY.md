@@ -1,8 +1,17 @@
-# [2020-10-16] 19:21
+# [2020-10-16] 19:21 - 20:49
 A one month hiatus :) as always.
 
 Goals:
 * Work on login / registration page.
+
+Completed:
+* Add registration page
+  * Contains text fields for username and name
+  * Added a floating action button
+
+TODO:
+* Add the register pipeline to the server.
+* Add pending request with a CircularIndicator
 
 # [2020-09-04] 20:50
 
@@ -21,8 +30,6 @@ The icon is a little smaller than I'd like but we can fix that later.
 
 Create a keystore in hidden home directory.
 
-Manually, update some android files to sign. I assume this won't sign for iOS.
-Also have some specific depdencies on the LOCATION of the repository now which isn't ideal
 but we can work with it!
 
 # Colors
