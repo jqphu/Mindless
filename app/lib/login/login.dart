@@ -117,7 +117,7 @@ class _LoginPageState extends State<LoginPage> {
             ])),
             floatingActionButton: Visibility(
                 child: FloatingActionButton(
-                    heroTag: "test",
+                    heroTag: "login",
                     child: Icon(Icons.navigate_next, size: 50),
                     onPressed: () async {
                       _handleNextButtonPress();
