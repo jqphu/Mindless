@@ -1,2 +1,5 @@
 # Mindless notes
-* [Diary](Diary)
+
+## [Diary](Diary)
+
+## [Setup](Setup)
