@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mindless/model/user.dart';
 
 import 'form_field.dart';
 
@@ -33,6 +34,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
     if (!_formKey.currentState.validate()) {
       return;
     }
+
+    User.register(_usernameController.text, _nameController.text);
   }
 
   @override

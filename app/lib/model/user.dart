@@ -40,4 +40,9 @@ class User {
     // Successfully, requested!
     return Future.value(User.fromJson(result["Login"]["user"]));
   }
+
+  static Future<User> register(String username, String name) async {
+    // Dummy delay for now.
+    return Future.delayed(Duration(seconds: 3));
+  }
 }
