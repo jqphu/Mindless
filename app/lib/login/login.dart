@@ -32,8 +32,9 @@ class _LoginPageState extends State<LoginPage> {
     switch (exception.error) {
       case RequestError.NotFound:
         {
-          Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => RegistrationPage()));
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) =>
+                  RegistrationPage(_usernameController.text)));
         }
         break;
       // Internal server error. Unexpected!

@@ -3,6 +3,11 @@ import 'package:flutter/material.dart';
 import 'form_field.dart';
 
 class RegistrationPage extends StatefulWidget {
+  // Initial username that was passed by the login page.
+  final String loginPageUsername;
+
+  RegistrationPage(this.loginPageUsername);
+
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
@@ -10,8 +15,17 @@ class RegistrationPage extends StatefulWidget {
 /// Registration page.
 class _RegistrationPageState extends State<RegistrationPage> {
   final _formKey = GlobalKey<FormState>();
+  // Initialize the username with what was passed in from login page.
   final _usernameController = TextEditingController();
   final _nameController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Initialize the username to what was in the login page.
+    _usernameController.text = widget.loginPageUsername;
+  }
 
   /// Handle a request to register.
   _handleRegister() {
