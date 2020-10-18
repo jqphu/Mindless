@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'package:mindless/model/user.dart';
 import 'package:mindless/server.dart';
@@ -21,6 +22,14 @@ class _LoginPageState extends State<LoginPage> {
   // Scaffold.
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  @override
+  void initState() {
+    super.initState();
+
+    // Handle already stored login information.
+    _initializeFromSecureStorage();
+  }
+
   void _resetState() {
     setState(() {
       _userRequest = null;
@@ -28,7 +37,27 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  void _resetLoginField() {
+  /// Retrieve the data from the secure storage and make a request if data exists.
+  _initializeFromSecureStorage() async {
+    final storage = new FlutterSecureStorage();
+
+    // Use await here meaning we will block initialization until we read from storage.
+    String username = await storage.read(key: "username");
+
+    if (username != null) {
+      _handleLoginAttempt(username);
+    }
+  }
+
+  _storeLoginSecureStorage(String username) async {
+    final storage = new FlutterSecureStorage();
+
+    await storage.write(key: "username", value: username);
+  }
+
+  void _finishSuccessfulLogin(String username) {
+    _storeLoginSecureStorage(username);
+
     setState(() {
       _resetState();
       _usernameController.clear();
@@ -43,7 +72,7 @@ class _LoginPageState extends State<LoginPage> {
         {
           Navigator.of(context).push(MaterialPageRoute(
               builder: (context) => RegistrationPage(
-                  _usernameController.text, _resetLoginField)));
+                  _usernameController.text, _finishSuccessfulLogin)));
         }
         break;
       // Internal server error. Unexpected!
@@ -71,25 +100,20 @@ class _LoginPageState extends State<LoginPage> {
     ));
   }
 
-  void _handleNextButtonPress() async {
+  void _handleLoginAttempt(String username) async {
     // Request is in progress.
     if (_userRequest != null) {
       return;
     }
 
-    // Validate the input
-    if (!_formKey.currentState.validate()) {
-      return;
-    }
-
     setState(() {
-      _userRequest = User.login(_usernameController.text);
+      _userRequest = User.login(username);
     });
 
     _userRequest
         .then((user) {
           // Reset everything, we are done with login!
-          _resetLoginField();
+          _finishSuccessfulLogin(username);
 
           Navigator.of(context).pushNamed('/home', arguments: user);
         })
@@ -130,7 +154,12 @@ class _LoginPageState extends State<LoginPage> {
                     heroTag: "login",
                     child: Icon(Icons.navigate_next, size: 50),
                     onPressed: () async {
-                      _handleNextButtonPress();
+                      // Validate the input
+                      if (!_formKey.currentState.validate()) {
+                        return;
+                      }
+
+                      _handleLoginAttempt(_usernameController.text);
                     }),
                 visible: !connecting),
           );
@@ -172,6 +201,7 @@ class _LoginFieldState extends State<LoginField> {
   @override
   void initState() {
     super.initState();
+
     _usernameFocusNode.addListener(() {
       // Redraw every-time the username focus state changes.
       setState(() {});

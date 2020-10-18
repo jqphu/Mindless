@@ -8,9 +8,10 @@ class RegistrationPage extends StatefulWidget {
   // Initial username that was passed by the login page.
   final String loginPageUsername;
 
-  final clearParentCallback;
+  // Callback to complete login with a string.
+  final Function(String) _finishSuccessfulLoginCallback;
 
-  RegistrationPage(this.loginPageUsername, this.clearParentCallback);
+  RegistrationPage(this.loginPageUsername, this._finishSuccessfulLoginCallback);
 
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
@@ -81,15 +82,14 @@ class _RegistrationPageState extends State<RegistrationPage> {
   }
 
   /// Handle a request to register.
-  _handleRegister() {
+  _handleRegister(String username, String name) {
     // Validate the input
     if (!_formKey.currentState.validate()) {
       return;
     }
 
     setState(() {
-      _userRequest =
-          User.register(_usernameController.text, _nameController.text);
+      _userRequest = User.register(username, name);
     });
 
     _userRequest
@@ -98,7 +98,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           _usernameController.clear();
           _nameController.clear();
 
-          widget.clearParentCallback();
+          widget._finishSuccessfulLoginCallback(username);
 
           Navigator.of(context).pushReplacementNamed("/home", arguments: user);
         })
@@ -141,7 +141,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
                     heroTag: "register",
                     child: Icon(Icons.navigate_next, size: 50),
                     onPressed: () async {
-                      _handleRegister();
+                      _handleRegister(
+                          _usernameController.text, _nameController.text);
                     }),
                 visible: !connecting),
           );
