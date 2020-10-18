@@ -20,6 +20,9 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _usernameController = TextEditingController();
   final _nameController = TextEditingController();
 
+  // Request to register.
+  Future<User> _userRequest;
+
   @override
   void initState() {
     super.initState();
@@ -35,28 +38,49 @@ class _RegistrationPageState extends State<RegistrationPage> {
       return;
     }
 
-    User.register(_usernameController.text, _nameController.text);
+    setState(() {
+      _userRequest =
+          User.register(_usernameController.text, _nameController.text);
+    });
+  }
+
+  /// Build the registration form field widget if we're not connecting.
+  Widget _buildRegistrationFormFieldWidget(bool connecting) {
+    if (!connecting) {
+      return RegistrationFormField(
+          _formKey, _usernameController, _nameController);
+    } else {
+      return Center(child: CircularProgressIndicator());
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildMonkeyBar(context),
-      body: SafeArea(
-          child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: 24.0),
-              children: <Widget>[
-            SizedBox(height: 140.0),
-            RegistrationFormField(
-                _formKey, _usernameController, _nameController)
-          ])),
-      floatingActionButton: FloatingActionButton(
-          heroTag: "login",
-          child: Icon(Icons.navigate_next, size: 50),
-          onPressed: () async {
-            _handleRegister();
-          }),
-    );
+    return FutureBuilder(
+        future: _userRequest,
+        builder: (context, snapshot) {
+          final connecting =
+              snapshot.connectionState == ConnectionState.waiting;
+
+          return Scaffold(
+            appBar: buildMonkeyBar(context),
+            body: SafeArea(
+                child: ListView(
+                    padding: EdgeInsets.symmetric(horizontal: 24.0),
+                    children: <Widget>[
+                  SizedBox(height: 140.0),
+                  _buildRegistrationFormFieldWidget(connecting)
+                ])),
+            floatingActionButton: Visibility(
+                child: FloatingActionButton(
+                    heroTag: "register",
+                    child: Icon(Icons.navigate_next, size: 50),
+                    onPressed: () async {
+                      _handleRegister();
+                    }),
+                visible: !connecting),
+          );
+        });
   }
 }
 
