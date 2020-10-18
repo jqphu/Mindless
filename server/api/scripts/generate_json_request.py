@@ -1,5 +1,7 @@
 import requests
 import json
+import argparse
+
 from typing import List
 from datetime import datetime
 
@@ -21,8 +23,6 @@ class Instance:
         self.task_id = task_id
         self.start = start.strftime("%Y-%m-%dT%H:%M:%S.%f")
         self.end = end.strftime("%Y-%m-%dT%H:%M:%S.%f")
-
-SERVER_API = "localhost:8000";
 
 USERS = [
     User("jqphu", "Justin"),
@@ -68,23 +68,21 @@ TASK_INFO = [
 
 USER_ID = 1
 
-ENDPOINT = 'https://jqphu.dev/mindless/api'
-
-def create_users():
+def create_users(endpoint: str):
     for user in USERS:
         body = {
             'Create': user.__dict__
         }
 
         print(f"Request {body}")
-        r = requests.post(f'{ENDPOINT}/user', data = json.dumps(body))
+        r = requests.post(f'{endpoint}/user', data = json.dumps(body))
         if r.status_code != 200:
             exit(1)
 
         result = r.json()
         print(f"Result {result}")
 
-def create_tasks():
+def create_tasks(endpoint: str):
     print("Creating tasks.")
     body = {
         'InsertAll': {
@@ -102,7 +100,7 @@ def create_tasks():
     }
 
     print(f"Request: {json.dumps(body, default=str)}")
-    r = requests.post(f'{ENDPOINT}/task', data = json.dumps(body, default=str))
+    r = requests.post(f'{endpoint}/task', data = json.dumps(body, default=str))
     if r.status_code != 200:
         print(f"Failed with: {r.text}")
         exit(1)
@@ -115,11 +113,26 @@ def create_tasks():
     print("Done creating tasks.")
 
 
-def main():
-    create_users()
+def main(args):
+    if args.remote:
+        endpoint = 'https://jqphu.dev/mindless/api'
+    else:
+        endpoint = 'http://127.0.0.1/mindless/api'
+
+    create_users(endpoint)
     # Assume user always exists use id 1.
-    create_tasks()
+    create_tasks(endpoint)
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(
+            description='''
+Fills the database with dummy data.
+            '''
+    )
+
+    parser.add_argument('--remote', action='store_true', help='Send the data to the remote server (default: false)')
+
+    args = parser.parse_args()
+
     # execute only if run as a script
-    main()
+    main(args)
