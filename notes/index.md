@@ -1,0 +1,2 @@
+# Mindless notes
+* [Diary](Diary)
