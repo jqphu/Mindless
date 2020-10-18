@@ -120,7 +120,6 @@ def main(args):
         endpoint = 'http://127.0.0.1/mindless/api'
 
     create_users(endpoint)
-    # Assume user always exists use id 1.
     create_tasks(endpoint)
 
 if __name__ == '__main__':
