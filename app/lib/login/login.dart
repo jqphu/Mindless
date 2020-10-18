@@ -22,8 +22,17 @@ class _LoginPageState extends State<LoginPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   void _resetState() {
-    _userRequest = null;
-    _scaffoldKey.currentState.removeCurrentSnackBar();
+    setState(() {
+      _userRequest = null;
+      _scaffoldKey.currentState.removeCurrentSnackBar();
+    });
+  }
+
+  void _resetLoginField() {
+    setState(() {
+      _resetState();
+      _usernameController.clear();
+    });
   }
 
   void _handleServerException(exception) {
@@ -33,8 +42,8 @@ class _LoginPageState extends State<LoginPage> {
       case RequestError.NotFound:
         {
           Navigator.of(context).push(MaterialPageRoute(
-              builder: (context) =>
-                  RegistrationPage(_usernameController.text)));
+              builder: (context) => RegistrationPage(
+                  _usernameController.text, _resetLoginField)));
         }
         break;
       // Internal server error. Unexpected!
@@ -79,8 +88,8 @@ class _LoginPageState extends State<LoginPage> {
 
     _userRequest
         .then((user) {
-          _resetState();
-          _usernameController.clear();
+          // Reset everything, we are done with login!
+          _resetLoginField();
 
           Navigator.of(context).pushNamed('/home', arguments: user);
         })

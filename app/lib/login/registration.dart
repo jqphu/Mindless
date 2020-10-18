@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mindless/model/user.dart';
+import 'package:mindless/server.dart';
 
 import 'form_field.dart';
 
@@ -7,7 +8,9 @@ class RegistrationPage extends StatefulWidget {
   // Initial username that was passed by the login page.
   final String loginPageUsername;
 
-  RegistrationPage(this.loginPageUsername);
+  final clearParentCallback;
+
+  RegistrationPage(this.loginPageUsername, this.clearParentCallback);
 
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
@@ -15,7 +18,9 @@ class RegistrationPage extends StatefulWidget {
 
 /// Registration page.
 class _RegistrationPageState extends State<RegistrationPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
+
   // Initialize the username with what was passed in from login page.
   final _usernameController = TextEditingController();
   final _nameController = TextEditingController();
@@ -31,6 +36,50 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _usernameController.text = widget.loginPageUsername;
   }
 
+  void _resetState() {
+    _userRequest = null;
+    _scaffoldKey.currentState.removeCurrentSnackBar();
+  }
+
+  void _handleServerException(exception) {
+    _resetState();
+
+    switch (exception.error) {
+      case RequestError.AlreadyExists:
+        {
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text("Someone already snagged this username!"),
+            duration: Duration(seconds: 2),
+          ));
+        }
+        break;
+      // Internal server error. Unexpected!
+      default:
+        {
+          _scaffoldKey.currentState.showSnackBar(SnackBar(
+            behavior: SnackBarBehavior.floating,
+            content: Text(
+                "Server returned an error. Justin probably broke something!"),
+            duration: Duration(seconds: 2),
+          ));
+        }
+        break;
+    }
+  }
+
+  // TODO: de-dup this with the login and other areas.
+  void _handleUnexpectedException(exception) {
+    _resetState();
+
+    _scaffoldKey.currentState.showSnackBar(SnackBar(
+      behavior: SnackBarBehavior.floating,
+      content:
+          Text("Something unexpected went wrong :(. Try again? $exception"),
+      duration: Duration(seconds: 2),
+    ));
+  }
+
   /// Handle a request to register.
   _handleRegister() {
     // Validate the input
@@ -42,6 +91,21 @@ class _RegistrationPageState extends State<RegistrationPage> {
       _userRequest =
           User.register(_usernameController.text, _nameController.text);
     });
+
+    _userRequest
+        .then((user) {
+          _resetState();
+          _usernameController.clear();
+          _nameController.clear();
+
+          widget.clearParentCallback();
+
+          Navigator.of(context).pushReplacementNamed("/home", arguments: user);
+        })
+        // Catch server errors.
+        .catchError(_handleServerException, test: (e) => e is RequestException)
+        // Catch all other errors.
+        .catchError((exception) => _handleUnexpectedException(exception));
   }
 
   /// Build the registration form field widget if we're not connecting.
@@ -63,6 +127,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
               snapshot.connectionState == ConnectionState.waiting;
 
           return Scaffold(
+            key: _scaffoldKey,
             appBar: buildMonkeyBar(context),
             body: SafeArea(
                 child: ListView(
