@@ -79,7 +79,7 @@ class _LoginPageState extends State<LoginPage> {
 
     _userRequest
         .then((user) {
-          _userRequest = null;
+          _resetState();
           _usernameController.clear();
 
           Navigator.of(context).pushNamed('/home', arguments: user);
