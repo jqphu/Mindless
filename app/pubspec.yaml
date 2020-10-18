@@ -40,6 +40,12 @@ dev_dependencies:
   # To create icons
   flutter_launcher_icons: "^0.7.3"
 
+  # Static analyzer!
+  analyzer: "^0.40.4"
+
+  # Add stricter warnings
+  pedantic: ^1.0.0
+
 flutter_icons:
   android: "launcher_icon"
   ios: true

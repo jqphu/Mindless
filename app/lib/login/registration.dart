@@ -19,7 +19,7 @@ class RegistrationPage extends StatefulWidget {
 
 /// Registration page.
 class _RegistrationPageState extends State<RegistrationPage> {
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final _formKey = GlobalKey<FormState>();
 
   // Initialize the username with what was passed in from login page.
@@ -50,7 +50,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
         {
           _scaffoldKey.currentState.showSnackBar(SnackBar(
             behavior: SnackBarBehavior.floating,
-            content: Text("Someone already snagged this username!"),
+            content: Text('Someone already snagged this username!'),
             duration: Duration(seconds: 2),
           ));
         }
@@ -61,7 +61,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           _scaffoldKey.currentState.showSnackBar(SnackBar(
             behavior: SnackBarBehavior.floating,
             content: Text(
-                "Server returned an error. Justin probably broke something!"),
+                'Server returned an error. Justin probably broke something!'),
             duration: Duration(seconds: 2),
           ));
         }
@@ -76,13 +76,13 @@ class _RegistrationPageState extends State<RegistrationPage> {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
       content:
-          Text("Something unexpected went wrong :(. Try again? $exception"),
+          Text('Something unexpected went wrong :(. Try again? $exception'),
       duration: Duration(seconds: 2),
     ));
   }
 
   /// Handle a request to register.
-  _handleRegister(String username, String name) {
+  void _handleRegister(String username, String name) {
     // Validate the input
     if (!_formKey.currentState.validate()) {
       return;
@@ -100,7 +100,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
           widget._finishSuccessfulLoginCallback(username);
 
-          Navigator.of(context).pushReplacementNamed("/home", arguments: user);
+          Navigator.of(context).pushReplacementNamed('/home', arguments: user);
         })
         // Catch server errors.
         .catchError(_handleServerException, test: (e) => e is RequestException)
@@ -138,7 +138,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
                 ])),
             floatingActionButton: Visibility(
                 child: FloatingActionButton(
-                    heroTag: "register",
+                    heroTag: 'register',
                     child: Icon(Icons.navigate_next, size: 50),
                     onPressed: () async {
                       _handleRegister(
@@ -190,13 +190,13 @@ class _RegistrationFormFieldState extends State<RegistrationFormField> {
         key: widget._formKey,
         child: Column(mainAxisSize: MainAxisSize.min, children: <Widget>[
           SizedBox(height: 50.0),
-          buildFormField(context, "Username", "Pick a username! Any username.",
+          buildFormField(context, 'Username', 'Pick a username! Any username.',
               widget._usernameController, _usernameFocusNode),
           SizedBox(height: 10.0),
           buildFormField(
               context,
-              "Name",
-              "Did your parents forget to name you?",
+              'Name',
+              'Did your parents forget to name you?',
               widget._nameController,
               _nameFocusNode),
         ]));

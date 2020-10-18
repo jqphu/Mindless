@@ -20,7 +20,7 @@ class _LoginPageState extends State<LoginPage> {
   Future<User> _userRequest;
 
   // Scaffold.
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -38,21 +38,21 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   /// Retrieve the data from the secure storage and make a request if data exists.
-  _initializeFromSecureStorage() async {
-    final storage = new FlutterSecureStorage();
+  void _initializeFromSecureStorage() async {
+    final storage = FlutterSecureStorage();
 
     // Use await here meaning we will block initialization until we read from storage.
-    String username = await storage.read(key: "username");
+    var username = await storage.read(key: 'username');
 
     if (username != null) {
       _handleLoginAttempt(username);
     }
   }
 
-  _storeLoginSecureStorage(String username) async {
-    final storage = new FlutterSecureStorage();
+  void _storeLoginSecureStorage(String username) async {
+    final storage = FlutterSecureStorage();
 
-    await storage.write(key: "username", value: username);
+    await storage.write(key: 'username', value: username);
   }
 
   void _finishSuccessfulLogin(String username) {
@@ -81,7 +81,7 @@ class _LoginPageState extends State<LoginPage> {
           _scaffoldKey.currentState.showSnackBar(SnackBar(
             behavior: SnackBarBehavior.floating,
             content: Text(
-                "Server returned an error. Justin probably broke something!"),
+                'Server returned an error. Justin probably broke something!'),
             duration: Duration(seconds: 2),
           ));
         }
@@ -95,7 +95,7 @@ class _LoginPageState extends State<LoginPage> {
     _scaffoldKey.currentState.showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
       content:
-          Text("Something unexpected went wrong :(. Try again? $exception"),
+          Text('Something unexpected went wrong :(. Try again? $exception'),
       duration: Duration(seconds: 2),
     ));
   }
@@ -110,7 +110,7 @@ class _LoginPageState extends State<LoginPage> {
       _userRequest = User.login(username);
     });
 
-    _userRequest
+    await _userRequest
         .then((user) {
           // Reset everything, we are done with login!
           _finishSuccessfulLogin(username);
@@ -151,7 +151,7 @@ class _LoginPageState extends State<LoginPage> {
             ])),
             floatingActionButton: Visibility(
                 child: FloatingActionButton(
-                    heroTag: "login",
+                    heroTag: 'login',
                     child: Icon(Icons.navigate_next, size: 50),
                     onPressed: () async {
                       // Validate the input
@@ -216,7 +216,7 @@ class _LoginFieldState extends State<LoginField> {
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Column(children: <Widget>[
-                buildFormField(context, "Username", "Fill me in!",
+                buildFormField(context, 'Username', 'Fill me in!',
                     widget._usernameController, _usernameFocusNode)
               ])),
         ]));

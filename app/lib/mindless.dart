@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'home.dart';
 import 'login/login.dart';
 
-const kColorPrimary = const Color(0xFFF1FAEE);
-const kColorAccent = const Color(0xFF48CAE4);
-const kColorBrown = const Color(0xFF442B2D);
+const kColorPrimary = Color(0xFFF1FAEE);
+const kColorAccent = Color(0xFF48CAE4);
+const kColorBrown = Color(0xFF442B2D);
 
 ThemeData _buildMindlessTheme() {
   final base = ThemeData.light();
