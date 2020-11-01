@@ -1,3 +1,32 @@
+# [2020-10-18]
+
+## Start
+New diary format! Trying to standardize on vimwiki :)
+
+Just some casual Sunday programming. No major goals / milestones.
+
+I was listening to How I Built This with Guy Raz and now motivated to build things again :P.
+At least my hiatuses are shorter and shorter.
+
+## During
+
+TODO:
+* [X] Finish registration page
+* [X] Fix pedantic static analysis issues
+~~* [ ] Add build watcher pubspec~~
+  * This wasn't what I was expecting
+* [X] Secure storage to persist login information
+
+We will clear the secure storage when we press "logout" in the home page.
+For now we never clear the secure storage.
+
+Need up update SDK version for secure storage.
+
+## End of day
+We got registration done! Quite nice :) Also added some persistent storage.
+
+Nice little chunk of work for today. Time to call it a day though.
+
 # [2020-10-16] 19:21 - 20:49
 A one month hiatus :) as always.
 
@@ -6,8 +35,8 @@ Goals:
 
 Completed:
 * Add registration page
-  * Contains text fields for username and name
-  * Added a floating action button
+* Contains text fields for username and name
+* Added a floating action button
 
 TODO:
 * Add the register pipeline to the server.
