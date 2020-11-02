@@ -52,7 +52,7 @@ class Mindless extends StatelessWidget {
         theme: _buildMindlessTheme(),
         routes: {
           '/': (context) => LoginPage(),
-          '/home': (context) => MyHomePage(title: 'Flutter Demo Home Page'),
+          '/home': (context) => HomePage(),
         });
   }
 }
