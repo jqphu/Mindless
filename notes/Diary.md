@@ -1,3 +1,16 @@
+# [2020-11-01] 15:39 - 17:23
+## Start
+Just working the home page I guess?
+
+## End of session
+Set up basic home page tab view.
+
+"Finished" the accounts page. This is kept very scratch like since it is not part of core
+functionality. We will re-visit this and what we really want here (probably a settings style with
+editing name etc) later.
+
+TODO: Homepage! Implement the core homepage :)
+
 # [2020-10-18]
 
 ## Start
