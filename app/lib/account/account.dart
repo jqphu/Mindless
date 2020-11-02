@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:mindless/model/user_state.dart';
 
 class AccountsTabPage extends StatelessWidget {
@@ -29,12 +29,21 @@ class AccountsTabPage extends StatelessWidget {
 }
 
 class LogoutButton extends StatelessWidget {
+  /// Clear the secure storage login information since we now logged out.
+  void _clearLoginSecureStorage() async {
+    final storage = FlutterSecureStorage();
+
+    await storage.delete(key: 'username');
+  }
+
   @override
   Widget build(BuildContext context) {
     return RaisedButton(
       onPressed: () {
-        // TODO: Clear local storage and go back to login page.
-        print('Received click');
+        _clearLoginSecureStorage();
+
+        // Go back to login page.
+        Navigator.of(context).pop();
       },
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 10),
