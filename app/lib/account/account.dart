@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'package:mindless/model/user_state.dart';
 
 class AccountsTabPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Update this page whenever the UserStateModel changes.
+    // For now it never changes, but later we can have change username etc.
+    var user = context.watch<UserStateModel>();
+
     return SafeArea(
         child: Padding(
             padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16),
@@ -13,8 +20,8 @@ class AccountsTabPage extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: [
                   SizedBox(height: 10),
-                  Text("jqphu", textScaleFactor: 1.5),
-                  Text("Justin Q Phu"),
+                  Text(user.username, textScaleFactor: 1.5),
+                  Text(user.name),
                   Divider(color: Colors.grey),
                   LogoutButton(),
                 ])));
