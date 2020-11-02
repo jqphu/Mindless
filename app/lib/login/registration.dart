@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindless/model/user.dart';
 import 'package:mindless/server.dart';
+import 'package:mindless/mindless.dart';
 
 import 'form_field.dart';
 
@@ -148,19 +149,6 @@ class _RegistrationPageState extends State<RegistrationPage> {
           );
         });
   }
-}
-
-/// Build the app bar with a monkey and a title.
-AppBar buildMonkeyBar(BuildContext context) {
-  return AppBar(
-    titleSpacing: 0.0,
-    title: Row(children: <Widget>[
-      Image.asset('assets/monkey.png', height: 40),
-      SizedBox(width: 11),
-      Text('MINDLESS',
-          style: Theme.of(context).textTheme.headline3, textScaleFactor: 0.75),
-    ]),
-  );
 }
 
 class RegistrationFormField extends StatefulWidget {

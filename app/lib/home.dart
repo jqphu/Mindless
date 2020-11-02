@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'login/registration.dart';
+import 'package:mindless/mindless.dart';
 
 import 'model/user.dart';
+import 'account/account.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -19,9 +20,6 @@ class HomePage extends StatelessWidget {
                 Tab(icon: Icon(Icons.account_circle)),
               ],
             ),
-            body: TabBarView(children: [
-              Icon(Icons.home),
-              Icon(Icons.account_circle),
-            ])));
+            body: TabBarView(children: [Icon(Icons.home), AccountsTabPage()])));
   }
 }
