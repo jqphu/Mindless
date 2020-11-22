@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:mindless/model/user_state.dart';
+import 'package:mindless/model/app_state.dart';
 
 class AccountsTabPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // Update this page whenever the UserStateModel changes.
+    // Update this page whenever the AppStateModel changes.
     // For now it never changes, but later we can have change username etc.
-    var user = context.watch<UserStateModel>();
+    var user = context.watch<AppStateModel>();
 
     return SafeArea(
         child: Padding(
