@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:mindless/model/app_state.dart';
 
 import 'task_row_item.dart';
+import 'task_current.dart';
 
 class TaskTabPage extends StatelessWidget {
   @override
@@ -28,7 +29,8 @@ class TaskTabPage extends StatelessWidget {
                 return null;
               },
             ),
-          )
+          ),
+          TaskCurrent(),
         ]));
       },
     );
