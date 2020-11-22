@@ -3,6 +3,7 @@ import 'package:mindless/mindless.dart';
 import 'package:provider/provider.dart';
 
 import 'model/app_state.dart';
+import 'tasks/task_tab_page.dart';
 import 'model/user.dart';
 import 'account/account.dart';
 
@@ -24,7 +25,7 @@ class HomePage extends StatelessWidget {
                     Tab(icon: Icon(Icons.account_circle)),
                   ],
                 ),
-                body: TabBarView(
-                    children: [Icon(Icons.home), AccountsTabPage()]))));
+                body:
+                    TabBarView(children: [TaskTabPage(), AccountsTabPage()]))));
   }
 }
