@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:mindless/model/app_state.dart';
+import 'package:mindless/mindless.dart';
 
 import 'package:mindless/model/task.dart';
 
@@ -14,8 +15,8 @@ class TaskCurrent extends StatelessWidget {
         }
 
         return Container(
-          height: MediaQuery.of(context).size.height / 15,
-          color: Colors.lightBlue,
+          constraints: BoxConstraints(minHeight: 50),
+          color: kColorPrimary,
           child: Padding(
               padding: const EdgeInsets.only(
                 left: 16,

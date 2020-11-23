@@ -19,12 +19,14 @@ class HomePage extends StatelessWidget {
             create: (context) => AppStateModel(user)..loadTasks(),
             child: Scaffold(
                 appBar: buildMonkeyBar(context),
-                bottomNavigationBar: TabBar(
-                  tabs: [
-                    Tab(icon: Icon(Icons.home)),
-                    Tab(icon: Icon(Icons.account_circle)),
-                  ],
-                ),
+                bottomNavigationBar: Container(
+                    color: kColorPrimary,
+                    child: TabBar(
+                      tabs: [
+                        Tab(icon: Icon(Icons.home)),
+                        Tab(icon: Icon(Icons.account_circle)),
+                      ],
+                    )),
                 body:
                     TabBarView(children: [TaskTabPage(), AccountsTabPage()]))));
   }
