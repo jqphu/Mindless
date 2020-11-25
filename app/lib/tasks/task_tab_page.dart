@@ -5,6 +5,7 @@ import 'package:mindless/mindless.dart';
 
 import 'task_row_item.dart';
 import 'task_current.dart';
+import 'search_page.dart';
 
 class TaskTabPage extends StatelessWidget {
   @override
@@ -52,7 +53,10 @@ class TaskTabPage extends StatelessWidget {
                 Icons.add,
                 color: kColorBrown,
               ),
-              onPressed: () {},
+              onPressed: () async {
+                await Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => SearchPage()));
+              },
             ));
       },
     );
