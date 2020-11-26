@@ -2,8 +2,12 @@
 ///
 /// This task can have multiple instances.
 class Task {
-  Task(this._name, this._userId, [this._totalTimeSpentToday])
-      : assert(_name != null);
+  Task(this._name, this._userId, [totalTimeSpentToday])
+      : assert(_name != null) {
+    if (totalTimeSpentToday != null) {
+      _totalTimeSpentToday = totalTimeSpentToday;
+    }
+  }
 
   int _id;
   final int _userId;
@@ -14,7 +18,7 @@ class Task {
   /// Total time spent on this application.
   ///
   /// This is cumulative of all time.
-  final Duration _totalTimeSpentToday;
+  Duration _totalTimeSpentToday = Duration();
 
   Duration get totalTimeSpentToday {
     assert(_totalTimeSpentToday != null);

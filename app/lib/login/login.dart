@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:provider/provider.dart';
+import 'package:mindless/model/app_state.dart';
 
 import 'package:mindless/model/user.dart';
 import 'package:mindless/server.dart';
@@ -112,6 +114,9 @@ class _LoginPageState extends State<LoginPage> {
 
     await _userRequest
         .then((user) {
+          // We don't care about updates, i.e. we don't listen to these values.
+          Provider.of<AppStateModel>(context, listen: false).user = user;
+
           // Reset everything, we are done with login!
           _finishSuccessfulLogin(username);
 

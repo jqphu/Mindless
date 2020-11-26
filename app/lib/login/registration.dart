@@ -129,7 +129,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
           return Scaffold(
             key: _scaffoldKey,
-            appBar: buildMonkeyBar(context),
+            appBar: buildMonkeyBar(context, backButton: true),
             body: SafeArea(
                 child: ListView(
                     padding: EdgeInsets.symmetric(horizontal: 24.0),

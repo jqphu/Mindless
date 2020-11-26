@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'home.dart';
 import 'login/login.dart';
+import 'tasks/search_page.dart';
+import 'model/app_state.dart';
 
 const kColorPrimary = Color(0xFFF1FAEE);
 const kColorAccent = Color(0xFF48CAE4);
@@ -47,23 +50,30 @@ class Mindless extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        title: 'Flutter Demo',
-        theme: _buildMindlessTheme(),
-        routes: {
-          '/': (context) => LoginPage(),
-          '/home': (context) => HomePage(),
-        });
+    return ChangeNotifierProvider<AppStateModel>(
+        create: (context) => AppStateModel(),
+        child: MaterialApp(
+            title: 'Mindless',
+            theme: _buildMindlessTheme(),
+            routes: {
+              '/': (context) => LoginPage(),
+              '/home': (context) => HomePage(),
+              '/search': (context) => SearchPage(),
+            }));
   }
 }
 
 /// Build the app bar with a monkey and a title.
-AppBar buildMonkeyBar(BuildContext context) {
+AppBar buildMonkeyBar(BuildContext context, {@required bool backButton}) {
+  assert(backButton != null);
+
   return AppBar(
+    automaticallyImplyLeading: backButton,
     titleSpacing: 0.0,
     title: Row(children: <Widget>[
+      SizedBox(width: 10),
       Image.asset('assets/monkey.png', height: 40),
-      SizedBox(width: 11),
+      SizedBox(width: 10),
       Text('MINDLESS',
           style: Theme.of(context).textTheme.headline3, textScaleFactor: 0.75),
     ]),

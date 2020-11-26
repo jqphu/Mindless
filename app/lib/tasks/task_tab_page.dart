@@ -54,8 +54,7 @@ class TaskTabPage extends StatelessWidget {
                 color: kColorBrown,
               ),
               onPressed: () async {
-                await Navigator.of(context).push(
-                    MaterialPageRoute(builder: (context) => SearchPage()));
+                await Navigator.of(context).pushNamed('/search');
               },
             ));
       },
