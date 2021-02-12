@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mindless/model/user.dart';
+import 'package:provider/provider.dart';
+import 'package:mindless/model/app_state.dart';
 import 'package:mindless/server.dart';
 import 'package:mindless/mindless.dart';
 
@@ -98,6 +100,8 @@ class _RegistrationPageState extends State<RegistrationPage> {
           _resetState();
           _usernameController.clear();
           _nameController.clear();
+
+          Provider.of<AppStateModel>(context, listen: false).user = user;
 
           widget._finishSuccessfulLoginCallback(username);
 

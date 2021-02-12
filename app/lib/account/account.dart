@@ -41,6 +41,7 @@ class LogoutButton extends StatelessWidget {
     return RaisedButton(
       onPressed: () {
         _clearLoginSecureStorage();
+        Provider.of<AppStateModel>(context, listen: false).reset();
 
         // Go back to login page.
         Navigator.of(context).pop();

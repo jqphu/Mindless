@@ -15,14 +15,19 @@ class AppStateModel extends ChangeNotifier {
 
   /// Initialize the AppStateModel with the user.
   AppStateModel() {
-    _user = null;
-    _tasks = [];
-    _currentTask = null;
+    reset();
   }
 
   String get username => _user.username;
   String get name => _user.name;
   Task get currentTask => _currentTask;
+
+  // Reset AppStateModel
+  void reset() {
+    _user = null;
+    _tasks = [];
+    _currentTask = null;
+  }
 
   set user(User user) {
     _user = user;
