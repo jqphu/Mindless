@@ -53,9 +53,12 @@ class AppStateModel extends ChangeNotifier {
 
   // Add a task
   Future<Task> addTask(String taskName) async {
-    return Future.delayed(Duration(seconds: 2), () => Task(taskName, _user.id))
+    return Future.delayed(
+            Duration(milliseconds: 2), () => Task(taskName, _user.id))
         .then((result) {
-      _tasks.add(result);
+      if (!_tasks.contains(result)) {
+        _tasks.add(result);
+      }
       return result;
     });
   }
