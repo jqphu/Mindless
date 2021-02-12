@@ -36,6 +36,9 @@ dependencies:
 
   http: ^0.12.2
 
+  # Logging!
+  logging: ^0.11.4
+
   # Search bar.
   flutter_search_bar: ^2.1.0
 

@@ -15,6 +15,12 @@ class User {
         username = jsonUser['username'],
         name = jsonUser['name'];
 
+  // Override toString for logging.
+  @override
+  String toString() {
+    return 'User(id:$id, username:$username, name:$name)';
+  }
+
   static Future<User> login(String username) async {
     var response = await http.post(kUserEndpoint,
         body: jsonEncode({

@@ -5,9 +5,12 @@ import 'package:mindless/model/app_state.dart';
 
 import 'package:mindless/model/user.dart';
 import 'package:mindless/server.dart';
+import 'package:logging/logging.dart';
 
 import 'registration.dart';
 import 'form_field.dart';
+
+final log = Logger('login');
 
 /// The login logic.
 class LoginPage extends StatefulWidget {
@@ -114,6 +117,8 @@ class _LoginPageState extends State<LoginPage> {
 
     await _userRequest
         .then((user) {
+          log.info('Logging in ${user}');
+
           // We don't care about updates, i.e. we don't listen to these values.
           Provider.of<AppStateModel>(context, listen: false).user = user;
 
