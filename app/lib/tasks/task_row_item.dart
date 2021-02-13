@@ -1,9 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
+import 'package:logging/logging.dart';
 import 'package:flutter/material.dart';
 
 import 'package:mindless/model/app_state.dart';
 import 'package:mindless/model/task.dart';
+
+final log = Logger('TaskRowItem');
 
 class TaskRowItem extends StatelessWidget {
   static const double rightOffset = 8;
@@ -71,8 +74,8 @@ class TaskRowItem extends StatelessWidget {
                             rightOffset,
                             0),
                         items: [
-                          PopupMenuItem<TaskRowOptions>(
-                              value: TaskRowOptions.delete,
+                          PopupMenuItem<TaskRowOptionTypes>(
+                              value: TaskRowOptionTypes.delete,
                               child: Row(
                                 children: [
                                   Icon(Icons.delete, semanticLabel: 'Delete'),
@@ -80,8 +83,8 @@ class TaskRowItem extends StatelessWidget {
                                   Text('Delete')
                                 ],
                               )),
-                          PopupMenuItem<TaskRowOptions>(
-                              value: TaskRowOptions.doNothing,
+                          PopupMenuItem<TaskRowOptionTypes>(
+                              value: TaskRowOptionTypes.doNothing,
                               child: Row(
                                 children: [
                                   Icon(Icons.lightbulb),
@@ -89,7 +92,18 @@ class TaskRowItem extends StatelessWidget {
                                   Text('Do nothing :)'),
                                 ],
                               ))
-                        ]);
+                        ]).then((taskRowOption) {
+                      switch (taskRowOption) {
+                        case TaskRowOptionTypes.delete:
+                          model.deleteTask(task);
+                          break;
+                        case TaskRowOptionTypes.doNothing:
+                          log.info('Doing nothing :)');
+                          break;
+                        default:
+                          log.info('Nothing selected.');
+                      }
+                    });
                   },
                   child: Icon(
                     Icons.more_vert,
@@ -122,4 +136,4 @@ class TaskRowItem extends StatelessWidget {
 }
 
 // Type of operations on the task row.
-enum TaskRowOptions { delete, doNothing }
+enum TaskRowOptionTypes { delete, doNothing }

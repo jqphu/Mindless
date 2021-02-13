@@ -7,7 +7,7 @@ import 'task_respository.dart';
 import 'user.dart';
 import 'task.dart';
 
-final log = Logger('app state');
+final log = Logger('AppState');
 
 class AppStateModel extends ChangeNotifier {
   /// User that is logged in. The user never is cleared.
@@ -68,7 +68,30 @@ class AppStateModel extends ChangeNotifier {
     return _tasks;
   }
 
-  // Add a task
+  // Delete a task
+  //
+  // Returns true if task was found and deleted, false when task wasn't found.
+  Future<bool> deleteTask(Task task) async {
+    if (task == currentTask) {
+      currentTask = null;
+    }
+
+    final found = _tasks.remove(task);
+
+    notifyListeners();
+
+    if (found) {
+      log.info('Task $task was removed.');
+    } else {
+      log.warning('Task $task was not removed.');
+    }
+
+    return found;
+  }
+
+  // Add a task.
+  //
+  // Returns the new task. This may not add the task if it already exists.
   Future<Task> addTask(String taskName) async {
     var foundTask = _tasks.singleWhere((Task task) => task.name == taskName,
         orElse: () => null);
