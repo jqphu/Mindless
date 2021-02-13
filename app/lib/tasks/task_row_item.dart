@@ -6,6 +6,8 @@ import 'package:mindless/model/app_state.dart';
 import 'package:mindless/model/task.dart';
 
 class TaskRowItem extends StatelessWidget {
+  static const double rightOffset = 8;
+
   /// The task to display.
   final Task task;
 
@@ -27,7 +29,7 @@ class TaskRowItem extends StatelessWidget {
             left: 16,
             top: 8,
             bottom: 8,
-            right: 8,
+            right: rightOffset,
           ),
           child: InkWell(
               child: Row(children: <Widget>[
@@ -43,8 +45,51 @@ class TaskRowItem extends StatelessWidget {
                 )),
                 MaterialButton(
                   minWidth: 0,
-                  onPressed: () {
-                    // TODO: Starting tasks
+                  onPressed: () async {
+                    // Get the Box which is the row.
+                    final RenderBox renderBox = context.findRenderObject();
+
+                    // Position of the row itself.
+                    final position = renderBox.localToGlobal(Offset.zero);
+
+                    // Size of the row.
+                    final size = renderBox.size;
+                    await showMenu(
+                        context: context,
+
+                        // We use the distance from top to be the position of
+                        // the row plus an offset. We use 3/4 of the height so
+                        // it starts within the row (easy to tell which item
+                        // we're modifying but near the bottom.)
+                        //
+                        // We use the full width as the size to push it to the
+                        // right but use the edge inset from right to match the
+                        // inset above.
+                        position: RelativeRect.fromLTRB(
+                            size.width,
+                            position.dy + (size.height * 3) / 4,
+                            rightOffset,
+                            0),
+                        items: [
+                          PopupMenuItem<TaskRowOptions>(
+                              value: TaskRowOptions.delete,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.delete, semanticLabel: 'Delete'),
+                                  SizedBox(width: 10),
+                                  Text('Delete')
+                                ],
+                              )),
+                          PopupMenuItem<TaskRowOptions>(
+                              value: TaskRowOptions.doNothing,
+                              child: Row(
+                                children: [
+                                  Icon(Icons.lightbulb),
+                                  SizedBox(width: 10),
+                                  Text('Do nothing :)'),
+                                ],
+                              ))
+                        ]);
                   },
                   child: Icon(
                     Icons.more_vert,
@@ -75,3 +120,6 @@ class TaskRowItem extends StatelessWidget {
     });
   }
 }
+
+// Type of operations on the task row.
+enum TaskRowOptions { delete, doNothing }
