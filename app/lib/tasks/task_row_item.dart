@@ -21,40 +21,39 @@ class TaskRowItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<AppStateModel>(builder: (context, model, child) {
       final row = SafeArea(
-        top: false,
-        bottom: false,
-        minimum: const EdgeInsets.only(
-          left: 16,
-          top: 8,
-          bottom: 8,
-          right: 8,
-        ),
-        child: Row(
-          children: <Widget>[
-            Expanded(
-                child: Text(
-              task.name,
-              style: TextStyle(
-                color: Color.fromRGBO(0, 0, 0, 0.8),
-                fontSize: 20,
-                fontStyle: FontStyle.normal,
-                fontWeight: FontWeight.normal,
-              ),
-            )),
-            MaterialButton(
-              minWidth: 0,
-              onPressed: () {
-                // TODO: Starting tasks
-              },
-              child: Icon(
-                Icons.more_vert,
-                color: Colors.grey,
-                semanticLabel: 'Options',
-              ),
-            ),
-          ],
-        ),
-      );
+          top: false,
+          bottom: false,
+          minimum: const EdgeInsets.only(
+            left: 16,
+            top: 8,
+            bottom: 8,
+            right: 8,
+          ),
+          child: InkWell(
+              child: Row(children: <Widget>[
+                Expanded(
+                    child: Text(
+                  task.name,
+                  style: TextStyle(
+                    color: Color.fromRGBO(0, 0, 0, 0.8),
+                    fontSize: 20,
+                    fontStyle: FontStyle.normal,
+                    fontWeight: FontWeight.normal,
+                  ),
+                )),
+                MaterialButton(
+                  minWidth: 0,
+                  onPressed: () {
+                    // TODO: Starting tasks
+                  },
+                  child: Icon(
+                    Icons.more_vert,
+                    color: Colors.grey,
+                    semanticLabel: 'Options',
+                  ),
+                ),
+              ]),
+              onTap: () => model.currentTask = task));
 
       // Just return the row without the bottom line if it is the last item.
       if (isLastItem) {
