@@ -1,7 +1,13 @@
 import 'package:flutter/foundation.dart';
+import 'package:logging/logging.dart';
+
+import 'dart:async';
+
 import 'task_respository.dart';
 import 'user.dart';
 import 'task.dart';
+
+final log = Logger('app state');
 
 class AppStateModel extends ChangeNotifier {
   /// User that is logged in. The user never is cleared.
@@ -16,6 +22,12 @@ class AppStateModel extends ChangeNotifier {
   /// Initialize the AppStateModel with the user.
   AppStateModel() {
     reset();
+    Timer.periodic(Duration(seconds: 1), (Timer t) {
+      if (_currentTask != null) {
+        _currentTask.addDuration(Duration(seconds: 1));
+        notifyListeners();
+      }
+    });
   }
 
   String get username => _user.username;
@@ -58,12 +70,21 @@ class AppStateModel extends ChangeNotifier {
 
   // Add a task
   Future<Task> addTask(String taskName) async {
+    var foundTask = _tasks.singleWhere((Task task) => task.name == taskName,
+        orElse: () => null);
+    if (foundTask != null) {
+      log.info('Task $foundTask already exists. Returning.');
+      return foundTask;
+    }
+
     return Future.delayed(
             Duration(milliseconds: 2), () => Task(taskName, _user.id))
         .then((result) {
-      if (!_tasks.contains(result)) {
-        _tasks.add(result);
-      }
+      log.info('Task $result doesn\'t exist. Adding.');
+
+      _tasks.add(result);
+      notifyListeners();
+
       return result;
     });
   }

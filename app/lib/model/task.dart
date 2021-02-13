@@ -20,6 +20,11 @@ class Task {
   /// This is cumulative of all time.
   Duration _totalTimeSpentToday = Duration();
 
+  /// Add some elapsed duration for this task.
+  void addDuration(Duration time) {
+    _totalTimeSpentToday += time;
+  }
+
   Duration get totalTimeSpentToday {
     assert(_totalTimeSpentToday != null);
     return _totalTimeSpentToday;
