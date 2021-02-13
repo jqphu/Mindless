@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:mindless/model/app_state.dart';
-import 'package:pedantic/pedantic.dart';
-
-import 'task_row_item.dart';
+import 'package:mindless/model/task.dart';
 
 class SearchPage extends StatefulWidget {
   @override
@@ -18,6 +16,8 @@ class _SearchPageState extends State<SearchPage> {
 
   // The optional add task.
   AddTask addTask;
+
+  List<Task> filteredTasks = [];
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
@@ -33,16 +33,22 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   void _onChanged(String newValue) {
+    var provider = Provider.of<AppStateModel>(context, listen: false);
+    filteredTasks = provider.filterTasks(newValue);
+
     if (newValue == '') {
       _resetSearch();
       return;
     }
 
     setState(() {
-      addTask = AddTask(taskName: newValue);
+      if (!provider.existsTask(newValue)) {
+        addTask = AddTask(taskName: newValue);
+      }
     });
   }
 
+  // TODO: Trigger a search immediately.
   _SearchPageState() {
     searchBar = SearchBar(
       inBar: false,
@@ -72,7 +78,19 @@ class _SearchPageState extends State<SearchPage> {
           SizedBox(height: 10),
           if (addTask != null) addTask,
           if (addTask != null) Divider(color: Colors.grey),
-          Center(child: Text('hello')),
+          // TODO: Spinning indicator when loading tasks.
+          Expanded(
+              child: ListView.builder(
+                  itemCount: filteredTasks.length,
+                  itemBuilder: (context, index) {
+                    return ListTile(
+                        title: Text(
+                      filteredTasks[index].name,
+                      style: TextStyle(
+                        fontSize: 20,
+                      ),
+                    ));
+                  })),
         ])));
   }
 }

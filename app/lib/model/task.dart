@@ -35,7 +35,15 @@ class Task {
 
   // Equality determined by name for now.
   @override
-  bool operator ==(otherTask) => otherTask._name == _name;
+  bool operator ==(object) {
+    if (object is String) {
+      return object == name;
+    } else if (object is Task) {
+      return object._name == name;
+    } else {
+      throw 'Unknown comparison operator';
+    }
+  }
 
   @override
   int get hashCode => _name.hashCode;

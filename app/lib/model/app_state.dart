@@ -111,4 +111,21 @@ class AppStateModel extends ChangeNotifier {
       return result;
     });
   }
+
+  // Filter tasks.
+  //
+  // TODO: Return a future stream.
+  List<Task> filterTasks(String query) {
+    if (query.isEmpty) {
+      return _tasks;
+    } else {
+      // Filter by name!
+      return _tasks.where((task) => task.name.contains(query)).toList();
+    }
+  }
+
+  // Find task.
+  bool existsTask(String taskName) {
+    return _tasks.contains(taskName);
+  }
 }
