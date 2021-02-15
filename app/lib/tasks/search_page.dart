@@ -96,6 +96,10 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Update the filtered task once every build. This is to display the full search task list.
+    var provider = Provider.of<AppStateModel>(context, listen: false);
+    filteredTasks = provider.filterTasks('');
+
     return Scaffold(
         appBar: searchBar.build(context),
         body: SafeArea(
