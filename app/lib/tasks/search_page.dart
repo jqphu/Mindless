@@ -113,40 +113,33 @@ class AddTask extends StatelessWidget {
         ),
         child: Container(
             // TODO: Style this so it stands out.
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-              Row(
-                children: <Widget>[
-                  Expanded(
-                      child: Text(
-                    taskName,
-                    style: TextStyle(
-                      fontSize: 20,
-                    ),
-                  )),
-                  MaterialButton(
-                    minWidth: 0,
-                    onPressed: () async {
-                      var provider =
-                          Provider.of<AppStateModel>(context, listen: false);
-                      var task = await provider.addTask(taskName);
-                      provider.currentTask = task;
+            child: Row(children: <Widget>[
+          Expanded(
+              child: Text(
+            taskName,
+            style: TextStyle(
+              fontSize: 20,
+            ),
+          )),
+          MaterialButton(
+            minWidth: 0,
+            onPressed: () async {
+              var provider = Provider.of<AppStateModel>(context, listen: false);
+              var task = await provider.addTask(taskName);
+              provider.currentTask = task;
 
-                      // TODO: Spinning pending wheel :)
+              // TODO: Spinning pending wheel :)
 
-                      // Created, back to home. Don't care when we finish with home, we are done with this route.
-                      await Navigator.of(context).pushReplacementNamed('/home');
-                    },
-                    child: Icon(
-                      Icons.add_box,
-                      size: 30,
-                      color: Colors.grey,
-                      semanticLabel: 'Create',
-                    ),
-                  ),
-                ],
-              ),
-            ])));
+              // Created, back to home. Don't care when we finish with home, we are done with this route.
+              await Navigator.of(context).pushReplacementNamed('/home');
+            },
+            child: Icon(
+              Icons.add_box,
+              size: 30,
+              color: Colors.grey,
+              semanticLabel: 'Create',
+            ),
+          ),
+        ])));
   }
 }
