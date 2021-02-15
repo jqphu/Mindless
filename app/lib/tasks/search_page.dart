@@ -77,20 +77,14 @@ class _SearchPageState extends State<SearchPage> {
             child: Column(children: <Widget>[
           SizedBox(height: 10),
           if (addTask != null) addTask,
-          if (addTask != null) Divider(color: Colors.grey),
+          if (addTask != null) Divider(color: Colors.grey, thickness: 2.0),
           // TODO: Spinning indicator when loading tasks.
           Expanded(
               child: ListView.builder(
-                  itemCount: filteredTasks.length,
-                  itemBuilder: (context, index) {
-                    return ListTile(
-                        title: Text(
-                      filteredTasks[index].name,
-                      style: TextStyle(
-                        fontSize: 20,
-                      ),
-                    ));
-                  })),
+            itemCount: filteredTasks.length,
+            itemBuilder: (context, index) =>
+                StartTask(task: filteredTasks[index]),
+          )),
         ])));
   }
 }
@@ -139,5 +133,55 @@ class AddTask extends StatelessWidget {
                 semanticLabel: 'Create',
               ),
             ])));
+  }
+}
+
+class StartTask extends StatelessWidget {
+  final Task task;
+
+  StartTask({@required this.task}) : assert(task != null);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(children: <Widget>[
+      SafeArea(
+          top: false,
+          bottom: false,
+          minimum: const EdgeInsets.only(
+            left: 16,
+            top: 8,
+            bottom: 8,
+            right: 8,
+          ),
+          child: InkWell(
+              onTap: () async {
+                var provider =
+                    Provider.of<AppStateModel>(context, listen: false);
+                provider.currentTask = task;
+
+                // TODO: Spinning pending wheel :)
+
+                // Created, back to home. Don't care when we finish with home, we are done with this route.
+                await Navigator.of(context).pushReplacementNamed('/home');
+              },
+
+              // TODO: Style this so it stands out.
+              child: Row(children: <Widget>[
+                Expanded(
+                    child: Text(
+                  task.name,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
+                )),
+              ]))),
+      Padding(
+        padding: const EdgeInsets.only(
+          left: 16,
+          right: 16,
+        ),
+        child: Container(height: 1, color: Color(0xFFD9D9D9)),
+      )
+    ]);
   }
 }
