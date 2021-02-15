@@ -48,6 +48,29 @@ class _SearchPageState extends State<SearchPage> {
     });
   }
 
+  /// Get the widgets corresponding to the AddTask section.
+  List<Widget> _getAddTaskWidgets() {
+    return [
+      SizedBox(height: 10),
+      Text('Create Task', textAlign: TextAlign.left),
+      addTask,
+      Divider(color: Colors.grey, thickness: 2.0),
+    ];
+  }
+
+  List<Widget> _getStartTaskWidgets() {
+    return [
+      SizedBox(height: 10),
+      // TODO: Spinning indicator when loading tasks.
+      Text('Start Task'),
+      Expanded(
+          child: ListView.builder(
+        itemCount: filteredTasks.length,
+        itemBuilder: (context, index) => StartTask(task: filteredTasks[index]),
+      ))
+    ];
+  }
+
   // TODO: Trigger a search immediately.
   _SearchPageState() {
     searchBar = SearchBar(
@@ -75,16 +98,8 @@ class _SearchPageState extends State<SearchPage> {
         appBar: searchBar.build(context),
         body: SafeArea(
             child: Column(children: <Widget>[
-          SizedBox(height: 10),
-          if (addTask != null) addTask,
-          if (addTask != null) Divider(color: Colors.grey, thickness: 2.0),
-          // TODO: Spinning indicator when loading tasks.
-          Expanded(
-              child: ListView.builder(
-            itemCount: filteredTasks.length,
-            itemBuilder: (context, index) =>
-                StartTask(task: filteredTasks[index]),
-          )),
+          if (addTask != null) ..._getAddTaskWidgets(),
+          if (filteredTasks.isNotEmpty) ..._getStartTaskWidgets(),
         ])));
   }
 }
