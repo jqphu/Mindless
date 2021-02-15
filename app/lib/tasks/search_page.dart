@@ -111,19 +111,8 @@ class AddTask extends StatelessWidget {
           bottom: 8,
           right: 8,
         ),
-        child: Container(
-            // TODO: Style this so it stands out.
-            child: Row(children: <Widget>[
-          Expanded(
-              child: Text(
-            taskName,
-            style: TextStyle(
-              fontSize: 20,
-            ),
-          )),
-          MaterialButton(
-            minWidth: 0,
-            onPressed: () async {
+        child: InkWell(
+            onTap: () async {
               var provider = Provider.of<AppStateModel>(context, listen: false);
               var task = await provider.addTask(taskName);
               provider.currentTask = task;
@@ -133,13 +122,22 @@ class AddTask extends StatelessWidget {
               // Created, back to home. Don't care when we finish with home, we are done with this route.
               await Navigator.of(context).pushReplacementNamed('/home');
             },
-            child: Icon(
-              Icons.add_box,
-              size: 30,
-              color: Colors.grey,
-              semanticLabel: 'Create',
-            ),
-          ),
-        ])));
+
+            // TODO: Style this so it stands out.
+            child: Row(children: <Widget>[
+              Expanded(
+                  child: Text(
+                taskName,
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              )),
+              Icon(
+                Icons.add_box,
+                size: 30,
+                color: Colors.grey,
+                semanticLabel: 'Create',
+              ),
+            ])));
   }
 }
