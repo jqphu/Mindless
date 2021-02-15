@@ -37,9 +37,9 @@ class Task {
   @override
   bool operator ==(object) {
     if (object is String) {
-      return object == name;
+      return object.toLowerCase() == name.toLowerCase();
     } else if (object is Task) {
-      return object._name == name;
+      return object._name.toLowerCase() == name.toLowerCase();
     } else {
       throw 'Unknown comparison operator';
     }

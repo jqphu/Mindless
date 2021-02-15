@@ -44,6 +44,8 @@ class _SearchPageState extends State<SearchPage> {
     setState(() {
       if (!provider.existsTask(newValue)) {
         addTask = AddTask(taskName: newValue);
+      } else {
+        addTask = null;
       }
     });
   }
