@@ -34,7 +34,9 @@ class _SearchPageState extends State<SearchPage> {
 
   void _onChanged(String newValue) {
     var provider = Provider.of<AppStateModel>(context, listen: false);
-    filteredTasks = provider.filterTasks(newValue);
+
+    // Don't match case!
+    filteredTasks = provider.filterTasks(newValue.toLowerCase());
 
     if (newValue == '') {
       _resetSearch();
