@@ -112,7 +112,7 @@ class AppStateModel extends ChangeNotifier {
     });
   }
 
-  // Filter tasks.
+  // Filter tasks ignoring case.
   //
   // TODO: Return a future stream.
   List<Task> filterTasks(String query) {
@@ -120,7 +120,10 @@ class AppStateModel extends ChangeNotifier {
       return _tasks;
     } else {
       // Filter by name!
-      return _tasks.where((task) => task.name.contains(query)).toList();
+      return _tasks
+          .where(
+              (task) => task.name.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     }
   }
 
