@@ -19,6 +19,7 @@ class TaskDatabase {
   /// Initialize Database.
   Future<User> initialize(User user) async {
     log.info('Initializing database!');
+    // await deleteDatabase(join(await getDatabasesPath(), kDatabaseName));
     db = await openDatabase(
       join(await getDatabasesPath(), kDatabaseName),
       // When the database is first created, create a table to store dogs.
@@ -33,6 +34,9 @@ CREATE TABLE IF NOT EXISTS tasks (
   -- Name of this task.
   name TEXT NOT NULL,
 
+  -- Time spent on this task in seconds.
+  time_spent INTEGER NOT NULL,
+
   FOREIGN KEY(user_id) REFERENCES users(id),
   FOREIGN KEY(parent_id) REFERENCES tasks(id),
 
@@ -41,8 +45,7 @@ CREATE TABLE IF NOT EXISTS tasks (
 );
 ''');
 
-        await db.execute(
-          '''
+        await db.execute('''
 CREATE TABLE IF NOT EXISTS users (
   id INTEGER NOT NULL PRIMARY KEY,
 
@@ -60,8 +63,7 @@ CREATE TABLE IF NOT EXISTS users (
   -- Ensure the usernames are unique.
   CONSTRAINT unique_username UNIQUE(username)
 );
-''',
-        );
+''');
       },
       // Set the version. This executes the onCreate function and provides a
       // path to perform database upgrades and downgrades.
@@ -88,7 +90,7 @@ CREATE TABLE IF NOT EXISTS users (
     var current_task;
     if (user_map['current_task_id'] != null) {
       Map task_map = (await db.query(kTableTasks,
-          columns: ['id', 'user_id', 'name'],
+          columns: ['id', 'user_id', 'name', 'time_spent'],
           where: 'id = ?',
           whereArgs: [user_map['current_task_id']],
           limit: 1))[0];
@@ -113,7 +115,7 @@ CREATE TABLE IF NOT EXISTS users (
     assert(db != null);
 
     List<Map> maps = await db.query(kTableTasks,
-        columns: ['id', 'user_id', 'name'],
+        columns: ['id', 'user_id', 'name', 'time_spent'],
         where: 'user_id = ?',
         whereArgs: [id]);
 

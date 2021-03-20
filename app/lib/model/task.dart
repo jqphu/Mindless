@@ -56,6 +56,7 @@ class Task {
     var map = <String, Object>{
       'user_id': _userId,
       'name': _name,
+      'time_spent': _totalTimeSpentToday.inSeconds,
     };
 
     if (id != null) {
@@ -68,5 +69,6 @@ class Task {
   Task.fromMap(Map<String, Object> map)
       : _name = map['name'],
         _userId = map['user_id'],
-        _id = map['id'];
+        _id = map['id'],
+        _totalTimeSpentToday = Duration(seconds: map['time_spent']);
 }
