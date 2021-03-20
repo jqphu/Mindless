@@ -3,13 +3,16 @@ import 'package:logging/logging.dart';
 
 import 'dart:async';
 
-import 'task_respository.dart';
+import 'database_repository.dart';
 import 'user.dart';
 import 'task.dart';
 
 final log = Logger('AppState');
 
 class AppStateModel extends ChangeNotifier {
+  /// The SQLite database.
+  TaskDatabase database = TaskDatabase();
+
   /// User that is logged in. The user never is cleared.
   User _user;
 
@@ -42,6 +45,9 @@ class AppStateModel extends ChangeNotifier {
   }
 
   set user(User user) {
+    // TODO: Initialize different DB for each user.
+    database.initialize(user.id);
+
     _user = user;
 
     // After logging in load the tasks.
@@ -58,7 +64,7 @@ class AppStateModel extends ChangeNotifier {
 
   // Loads the list of available products from the repo.
   void _loadTasks() async {
-    _tasks = await TasksRepository.loadTasks(_user.id);
+    _tasks = await database.loadTasks();
     _currentTask = _tasks[2];
     notifyListeners();
   }
