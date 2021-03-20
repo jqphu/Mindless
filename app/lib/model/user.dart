@@ -1,14 +1,34 @@
 import 'package:http/http.dart' as http;
 import 'package:mindless/server.dart';
+import 'package:mindless/model/task.dart';
 import 'dart:convert';
 
 /// Represent a User.
 class User {
   final String username;
   final String name;
-  final int id;
+  int id;
 
-  User(this.username, this.name, this.id);
+  Task currentTask;
+
+  User(this.username, this.name, this.id, this.currentTask);
+
+  Map<String, Object> toMap() {
+    var map = <String, Object>{
+      'username': username,
+      'name': name,
+    };
+
+    if (id != null) {
+      map['id'] = id;
+    }
+
+    if (currentTask != null) {
+      map['current_task_id'] = currentTask.id;
+    }
+
+    return map;
+  }
 
   User.fromJson(Map<String, dynamic> jsonUser)
       : id = jsonUser['id'],
@@ -23,7 +43,7 @@ class User {
 
   static Future<User> login(String username) async {
     if (username == 'test') {
-      return Future.value(User(username, 'justin', 1));
+      return Future.value(User(username, 'justin', 1, null));
     }
 
     var response = await http.post(kUserEndpoint,

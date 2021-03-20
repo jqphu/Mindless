@@ -48,9 +48,11 @@ class AppStateModel extends ChangeNotifier {
   set user(User user) {
     // TODO: Initialize different DB for each user.
 
-    _user = user;
+    database.initialize(user).then((user) {
+      log.finer('Update user to $user');
+      _user = user;
+      _currentTask = user.currentTask;
 
-    database.initialize().whenComplete(() {
       // After logging in load the tasks.
       _loadTasks();
 
@@ -59,7 +61,10 @@ class AppStateModel extends ChangeNotifier {
   }
 
   set currentTask(Task task) {
+    _user.currentTask = task;
     _currentTask = task;
+
+    database.updateUser(_user);
 
     notifyListeners();
   }
@@ -67,12 +72,7 @@ class AppStateModel extends ChangeNotifier {
   // Loads the list of available products from the repo.
   void _loadTasks() async {
     _tasks = await database.loadTasks(_user.id);
-    _currentTask = _tasks[2];
     notifyListeners();
-  }
-
-  void _saveTasks() async {
-    await database.saveTasks(_tasks);
   }
 
   // Returns a copy of the list of the current tasks.
@@ -84,7 +84,7 @@ class AppStateModel extends ChangeNotifier {
   //
   // Returns true if task was found and deleted, false when task wasn't found.
   Future<bool> deleteTask(Task task) async {
-    if (task == currentTask) {
+    if (task == _user.currentTask) {
       currentTask = null;
     }
 
