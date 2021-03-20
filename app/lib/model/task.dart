@@ -30,6 +30,7 @@ class Task {
     return _totalTimeSpentToday;
   }
 
+  set id(int id) => _id = id;
   int get id => _id;
   String get name => _name;
 
@@ -50,4 +51,22 @@ class Task {
 
   @override
   String toString() => '$_name (id=$_id) (userId=$_userId)';
+
+  Map<String, Object> toMap() {
+    var map = <String, Object>{
+      'user_id': _userId,
+      'name': _name,
+    };
+
+    if (id != null) {
+      map['id'] = id;
+    }
+
+    return map;
+  }
+
+  Task.fromMap(Map<String, Object> map)
+      : _name = map['name'],
+        _userId = map['user_id'],
+        _id = map['id'];
 }

@@ -1,26 +1,44 @@
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
+import 'package:logging/logging.dart';
 
 import 'task.dart';
 
+final log = Logger('login');
+
+// Create a database per user.
 const kDatabaseName = 'database.db';
 
-class TaskDatabase {
-  Database database;
+const kTableTasks = 'tasks';
 
-  int id;
+class TaskDatabase {
+  Database db;
 
   /// Initialize Database.
-  void initialize(int user_id) async {
-    id = user_id;
-
-    database = await openDatabase(
+  Future<void> initialize() async {
+    log.info('Initializing database!');
+    db = await openDatabase(
       join(await getDatabasesPath(), kDatabaseName),
       // When the database is first created, create a table to store dogs.
       onCreate: (db, version) {
         // Run the CREATE TABLE statement on the database.
         return db.execute(
-          'CREATE TABLE dogs(id INTEGER PRIMARY KEY, name TEXT, age INTEGER)',
+          '''
+CREATE TABLE IF NOT EXISTS tasks (
+  id INTEGER NOT NULL PRIMARY KEY,
+  parent_id INTEGER,
+  user_id INTEGER NOT NULL,
+
+  -- Name of this task.
+  name TEXT NOT NULL,
+
+  FOREIGN KEY(user_id) REFERENCES users(id),
+  FOREIGN KEY(parent_id) REFERENCES tasks(id),
+
+  -- Ensure the task and username pair is unique.
+  CONSTRAINT unique_task_username UNIQUE(user_id, name)
+);
+          ''',
         );
       },
       // Set the version. This executes the onCreate function and provides a
@@ -30,23 +48,43 @@ class TaskDatabase {
   }
 
   /// Get the tasks from the database.
-  Future<List<Task>> loadTasks() async {
-    return Future.delayed(Duration(seconds: 1), () {
-      return <Task>[
-        Task('Sleep', 1, Duration(hours: 8, minutes: 32)),
-        Task('Deep Work', 1, Duration(hours: 1, minutes: 07)),
-        Task('Exercise', 1, Duration(hours: 0, minutes: 40)),
-        Task('Mindless', 1, Duration(hours: 0, minutes: 00)),
-        Task('A', 1, Duration(hours: 0, minutes: 0)),
-        Task('B', 1, Duration(hours: 0, minutes: 0)),
-        Task('C', 1, Duration(hours: 0, minutes: 0)),
-        Task('D', 1, Duration(hours: 0, minutes: 0)),
-        Task('E', 1, Duration(hours: 0, minutes: 0)),
-        Task('F', 1, Duration(hours: 0, minutes: 0)),
-        Task('G', 1, Duration(hours: 0, minutes: 0)),
-        Task('H', 1, Duration(hours: 0, minutes: 0)),
-        Task('I', 1, Duration(hours: 18, minutes: 32)),
-      ];
+  Future<List<Task>> loadTasks(int id) async {
+    assert(db != null);
+
+    List<Map> maps = await db.query(kTableTasks,
+        columns: ['id, user_id, name'], where: 'user_id = ?', whereArgs: [id]);
+
+    return maps.map((Map map) => Task.fromMap(map)).toList();
+  }
+
+  Future<void> update(Task task) async {
+    log.finer('Updating task $task');
+    var count = await db.update(kTableTasks, task.toMap(),
+        where: 'id = ?', whereArgs: [task.id]);
+    assert(count == 1);
+  }
+
+  /// Delete a task.
+  Future<void> delete(Task task) async {
+    log.fine('Deleting task $task');
+    var count =
+        await db.delete(kTableTasks, where: 'id = ?', whereArgs: [task.id]);
+    assert(count == 1);
+  }
+
+  /// Insert a task.
+  Future<Task> insert(Task task) async {
+    log.fine('Inserting task $task');
+    task.id = await db.insert(kTableTasks, task.toMap());
+    return task;
+  }
+
+  Future<void> saveTasks(List<Task> tasks) async {
+    log.fine('Saving all tasks.');
+    await tasks.forEach((task) async {
+      await insert(task).catchError((error) {
+        log.fine('Failed to add $task with error $error.');
+      });
     });
   }
 }

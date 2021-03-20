@@ -25,9 +25,10 @@ class AppStateModel extends ChangeNotifier {
   /// Initialize the AppStateModel with the user.
   AppStateModel() {
     reset();
-    Timer.periodic(Duration(seconds: 1), (Timer t) {
+    Timer.periodic(Duration(seconds: 1), (Timer t) async {
       if (_currentTask != null) {
         _currentTask.addDuration(Duration(seconds: 1));
+        await database.update(_currentTask);
         notifyListeners();
       }
     });
@@ -46,14 +47,15 @@ class AppStateModel extends ChangeNotifier {
 
   set user(User user) {
     // TODO: Initialize different DB for each user.
-    database.initialize(user.id);
 
     _user = user;
 
-    // After logging in load the tasks.
-    _loadTasks();
+    database.initialize().whenComplete(() {
+      // After logging in load the tasks.
+      _loadTasks();
 
-    notifyListeners();
+      notifyListeners();
+    });
   }
 
   set currentTask(Task task) {
@@ -64,9 +66,13 @@ class AppStateModel extends ChangeNotifier {
 
   // Loads the list of available products from the repo.
   void _loadTasks() async {
-    _tasks = await database.loadTasks();
+    _tasks = await database.loadTasks(_user.id);
     _currentTask = _tasks[2];
     notifyListeners();
+  }
+
+  void _saveTasks() async {
+    await database.saveTasks(_tasks);
   }
 
   // Returns a copy of the list of the current tasks.
@@ -88,6 +94,7 @@ class AppStateModel extends ChangeNotifier {
 
     if (found) {
       log.info('Task $task was removed.');
+      await database.delete(task);
     } else {
       log.warning('Task $task was not removed.');
     }
@@ -106,16 +113,14 @@ class AppStateModel extends ChangeNotifier {
       return foundTask;
     }
 
-    return Future.delayed(
-            Duration(milliseconds: 2), () => Task(taskName, _user.id))
-        .then((result) {
-      log.info('Task $result doesn\'t exist. Adding.');
+    var result = Task(taskName, _user.id);
+    log.info('Task $result doesn\'t exist. Adding.');
 
-      _tasks.add(result);
-      notifyListeners();
+    _tasks.add(result);
+    await database.insert(result);
+    notifyListeners();
 
-      return result;
-    });
+    return result;
   }
 
   // Filter tasks ignoring case.
