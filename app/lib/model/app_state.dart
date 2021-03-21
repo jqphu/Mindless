@@ -28,7 +28,6 @@ class AppStateModel extends ChangeNotifier {
     Timer.periodic(Duration(seconds: 1), (Timer t) async {
       if (_currentTask != null) {
         _currentTask.addDuration(Duration(seconds: 1));
-        await database.update(_currentTask);
         notifyListeners();
       }
     });
@@ -61,8 +60,20 @@ class AppStateModel extends ChangeNotifier {
   }
 
   set currentTask(Task task) {
+    log.finer('Starting current task $task current is ${_user.currentTask}');
+
+    // Update current task state.
+    final now = DateTime.now();
+    if (_currentTask != task && _currentTask != null) {
+      database.update(_currentTask);
+    }
+
+    // Update the user to the new task.
     _user.currentTask = task;
     _currentTask = task;
+
+    // Reset starting task now.
+    _user.startedAt = now;
 
     database.updateUser(_user);
 

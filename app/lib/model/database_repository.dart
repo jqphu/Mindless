@@ -19,7 +19,7 @@ class TaskDatabase {
   /// Initialize Database.
   Future<User> initialize(User user) async {
     log.info('Initializing database!');
-    // await deleteDatabase(join(await getDatabasesPath(), kDatabaseName));
+    //await deleteDatabase(join(await getDatabasesPath(), kDatabaseName));
     db = await openDatabase(
       join(await getDatabasesPath(), kDatabaseName),
       // When the database is first created, create a table to store dogs.
@@ -58,6 +58,9 @@ CREATE TABLE IF NOT EXISTS users (
   -- Current task id. May be NULL.
   current_task_id INTEGER,
 
+  -- Started at time seconds since epoch.
+  started_at INTEGER,
+
   FOREIGN KEY(current_task_id) REFERENCES tasks(id),
 
   -- Ensure the usernames are unique.
@@ -82,11 +85,12 @@ CREATE TABLE IF NOT EXISTS users (
 
     // Must always exit.
     Map user_map = (await db.query(kTableUsers,
-        columns: ['id', 'username', 'name', 'current_task_id'],
+        columns: ['id', 'username', 'name', 'current_task_id', 'started_at'],
         where: 'username = ?',
         whereArgs: [user.username],
         limit: 1))[0];
 
+    var started_at;
     var current_task;
     if (user_map['current_task_id'] != null) {
       Map task_map = (await db.query(kTableTasks,
@@ -96,10 +100,27 @@ CREATE TABLE IF NOT EXISTS users (
           limit: 1))[0];
 
       current_task = Task.fromMap(task_map);
+
+      started_at = DateTime.fromMillisecondsSinceEpoch(
+          (user_map['started_at'] * 1000).round());
+
+      final now = DateTime.now();
+
+      // Add the time since we last loaded.
+      current_task.addDuration(now.difference(started_at));
+
+      await update(current_task);
+
+      // Update database
+      started_at = now;
     }
 
-    return User(
-        user_map['username'], user_map['name'], user_map['id'], current_task);
+    var new_user = User(user_map['username'], user_map['name'], user_map['id'],
+        current_task, started_at);
+
+    await updateUser(new_user);
+
+    return new_user;
   }
 
   Future<void> updateUser(User user) async {

@@ -50,7 +50,8 @@ class Task {
   int get hashCode => _name.hashCode;
 
   @override
-  String toString() => '$_name (id=$_id) (userId=$_userId)';
+  String toString() =>
+      '$_name (id=$_id) (userId=$_userId) (totalTime:$_totalTimeSpentToday)';
 
   Map<String, Object> toMap() {
     var map = <String, Object>{

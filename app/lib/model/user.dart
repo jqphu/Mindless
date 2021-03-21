@@ -11,7 +11,10 @@ class User {
 
   Task currentTask;
 
-  User(this.username, this.name, this.id, this.currentTask);
+  // Current task started at.
+  DateTime startedAt;
+
+  User(this.username, this.name, this.id, this.currentTask, this.startedAt);
 
   Map<String, Object> toMap() {
     var map = <String, Object>{
@@ -25,6 +28,7 @@ class User {
 
     if (currentTask != null) {
       map['current_task_id'] = currentTask.id;
+      map['started_at'] = startedAt.millisecondsSinceEpoch / 1000;
     }
 
     return map;
@@ -38,12 +42,12 @@ class User {
   // Override toString for logging.
   @override
   String toString() {
-    return 'User(id:$id, username:$username, name:$name)';
+    return 'User(id:$id, username:$username, name:$name, currentTask:$currentTask, startedAt:$startedAt)';
   }
 
   static Future<User> login(String username) async {
     if (username == 'test') {
-      return Future.value(User(username, 'justin', 1, null));
+      return Future.value(User(username, 'justin', 1, null, null));
     }
 
     var response = await http.post(kUserEndpoint,
