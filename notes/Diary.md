@@ -1,3 +1,11 @@
+# [2021-17-23] 16:18
+Well it's been a while since I've added an entry. Let's do something...
+
+I wonder if there's a use for a "pause". Just because I can't use it consistently.
+
+TODO:
+* [] Add a rename button (warmup task!)
+
 # [2020-11-01] 15:39 - 17:23
 ## Start
 Just working the home page I guess?

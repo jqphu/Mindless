@@ -84,12 +84,12 @@ class TaskRowItem extends StatelessWidget {
                                 ],
                               )),
                           PopupMenuItem<TaskRowOptionTypes>(
-                              value: TaskRowOptionTypes.doNothing,
+                              value: TaskRowOptionTypes.editName,
                               child: Row(
                                 children: [
-                                  Icon(Icons.lightbulb),
+                                  Icon(Icons.edit),
                                   SizedBox(width: 10),
-                                  Text('Do nothing :)'),
+                                  Text('Edit name'),
                                 ],
                               ))
                         ]).then((taskRowOption) {
@@ -97,8 +97,8 @@ class TaskRowItem extends StatelessWidget {
                         case TaskRowOptionTypes.delete:
                           model.deleteTask(task);
                           break;
-                        case TaskRowOptionTypes.doNothing:
-                          log.info('Doing nothing :)');
+                        case TaskRowOptionTypes.editName:
+                          log.info('Edit request');
                           break;
                         default:
                           log.info('Nothing selected.');
@@ -136,4 +136,4 @@ class TaskRowItem extends StatelessWidget {
 }
 
 // Type of operations on the task row.
-enum TaskRowOptionTypes { delete, doNothing }
+enum TaskRowOptionTypes { delete, editName }
