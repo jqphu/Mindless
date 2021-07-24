@@ -32,6 +32,21 @@ class _TaskRowItemState extends State<TaskRowItem> {
   /// Whether or not we are editing this task.
   bool isEditing = false;
 
+  /// Renaming task row controller.
+  TextEditingController _editingController;
+
+  @override
+  void initState() {
+    super.initState();
+    _editingController = TextEditingController(text: widget.task.name);
+  }
+
+  @override
+  void dispose() {
+    _editingController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<AppStateModel>(builder: (context, model, child) {
@@ -118,8 +133,10 @@ class _TaskRowItemState extends State<TaskRowItem> {
       } else {
         rowWidget = Row(children: <Widget>[
           Expanded(
-              child: Text(
-            'EDITING',
+              child: TextField(
+            onSubmitted: (value) {},
+            autofocus: true,
+            controller: _editingController,
             style: TextStyle(
               color: Color.fromRGBO(0, 0, 0, 0.8),
               fontSize: 20,
@@ -130,7 +147,8 @@ class _TaskRowItemState extends State<TaskRowItem> {
           MaterialButton(
             minWidth: 0,
             onPressed: () {
-              log.info('Save button pressed for name edit.');
+              log.info(
+                  'Save button pressed for name edit with name "${_editingController.text}".');
               setState(() {
                 isEditing = false;
               });
