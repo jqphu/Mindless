@@ -35,10 +35,25 @@ class _TaskRowItemState extends State<TaskRowItem> {
   /// Renaming task row controller.
   TextEditingController _editingController;
 
+  /// Listen to change of focus for editing controller.
+  final FocusNode _focusNode = FocusNode();
+
   @override
   void initState() {
     super.initState();
     _editingController = TextEditingController(text: widget.task.name);
+
+    // Listener to close edit bar when focus changes.
+    _focusNode.addListener(() {
+      setState(() {
+        if (!_focusNode.hasPrimaryFocus) {
+          log.info('Focus has changed, no longer editing.');
+          isEditing = false;
+          // Reset the text name
+          _editingController.text = widget.task.name;
+        }
+      });
+    });
   }
 
   @override
@@ -90,6 +105,15 @@ class _TaskRowItemState extends State<TaskRowItem> {
                           position.dy + (size.height * 3) / 4, rightOffset, 0),
                       items: [
                         PopupMenuItem<TaskRowOptionTypes>(
+                            value: TaskRowOptionTypes.editName,
+                            child: Row(
+                              children: [
+                                Icon(Icons.edit),
+                                SizedBox(width: 10),
+                                Text('Edit name'),
+                              ],
+                            )),
+                        PopupMenuItem<TaskRowOptionTypes>(
                             value: TaskRowOptionTypes.delete,
                             child: Row(
                               children: [
@@ -98,15 +122,6 @@ class _TaskRowItemState extends State<TaskRowItem> {
                                 Text('Delete')
                               ],
                             )),
-                        PopupMenuItem<TaskRowOptionTypes>(
-                            value: TaskRowOptionTypes.editName,
-                            child: Row(
-                              children: [
-                                Icon(Icons.edit),
-                                SizedBox(width: 10),
-                                Text('Edit name'),
-                              ],
-                            ))
                       ]).then((taskRowOption) {
                     switch (taskRowOption) {
                       case TaskRowOptionTypes.delete:
@@ -129,12 +144,16 @@ class _TaskRowItemState extends State<TaskRowItem> {
                 ),
               ),
             ]),
-            onTap: () => model.currentTask = widget.task);
+            onTap: () {
+              // Unfocus any editing.
+              FocusScope.of(context).unfocus();
+              model.currentTask = widget.task;
+            });
       } else {
         rowWidget = Row(children: <Widget>[
           Expanded(
               child: TextField(
-            onSubmitted: (value) {},
+            focusNode: _focusNode,
             autofocus: true,
             controller: _editingController,
             style: TextStyle(
