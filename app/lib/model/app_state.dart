@@ -113,6 +113,14 @@ class AppStateModel extends ChangeNotifier {
     return found;
   }
 
+  // Rename a task
+  Future<void> renameTask(Task task, String name) async {
+    task.name = name;
+    await database.update(task);
+
+    notifyListeners();
+  }
+
   // Add a task.
   //
   // Returns the new task. This may not add the task if it already exists.

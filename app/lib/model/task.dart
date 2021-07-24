@@ -13,7 +13,7 @@ class Task {
   final int _userId;
 
   /// The name of this task.
-  final String _name;
+  String _name;
 
   /// Total time spent on this application.
   ///
@@ -30,9 +30,11 @@ class Task {
     return _totalTimeSpentToday;
   }
 
+  set name(String name) => _name = name;
+  String get name => _name;
+
   set id(int id) => _id = id;
   int get id => _id;
-  String get name => _name;
 
   // Equality determined by name for now.
   @override

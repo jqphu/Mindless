@@ -146,9 +146,12 @@ class _TaskRowItemState extends State<TaskRowItem> {
           )),
           MaterialButton(
             minWidth: 0,
-            onPressed: () {
+            onPressed: () async {
               log.info(
                   'Save button pressed for name edit with name "${_editingController.text}".');
+
+              await model.renameTask(widget.task, _editingController.text);
+
               setState(() {
                 isEditing = false;
               });
