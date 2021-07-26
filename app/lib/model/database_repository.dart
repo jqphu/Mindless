@@ -67,6 +67,22 @@ CREATE TABLE IF NOT EXISTS users (
   CONSTRAINT unique_username UNIQUE(username)
 );
 ''');
+
+        await db.execute('''
+  CREATE TABLE IF NOT EXISTS instances (
+  id INTEGER NOT NULL PRIMARY KEY,
+
+  -- Which instance this period belongs to.
+  task_id INTEGER NOT NULL,
+
+  -- The time this period started.
+  started_at datetime,
+
+  -- The time this period completed.
+  ended_at datetime,
+
+  FOREIGN KEY(task_id) REFERENCES tasks(id)
+  ''');
       },
       // Set the version. This executes the onCreate function and provides a
       // path to perform database upgrades and downgrades.
