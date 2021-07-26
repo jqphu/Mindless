@@ -46,7 +46,7 @@ class User {
   }
 
   static Future<User> login(String username) async {
-    if (username == 'test') {
+    if (username.contains('test')) {
       return Future.value(User(username, 'justin', 1, null, null));
     }
 
