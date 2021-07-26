@@ -121,7 +121,7 @@ class AppStateModel extends ChangeNotifier {
   //
   // Returns the new task. This may not add the task if it already exists.
   Future<Task> addTask(String taskName) async {
-    Task? foundTask =
+    var foundTask =
         _tasks.singleWhereOrNull((Task task) => task.name == taskName);
     if (foundTask != null) {
       log.info('Task $foundTask already exists. Returning.');

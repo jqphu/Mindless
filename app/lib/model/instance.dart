@@ -19,6 +19,9 @@ class Instance {
   /// Time spent on this instance.
   Duration _timeSpent = Duration();
 
+  /// Whether this instance is running.
+  bool isActive = true;
+
   @override
   String toString() =>
       '$_startedAt (id=$id) (timeSpent=$_timeSpent) (task=$_task)';

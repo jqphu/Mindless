@@ -1,4 +1,5 @@
 import 'package:mindless/model/instance.dart';
+import 'package:collection/collection.dart';
 
 /// A Single Task
 ///
@@ -54,7 +55,7 @@ class Task {
 
   Map<String, Object> toMap() {
     var map = <String, Object>{
-      'userid': _userId,
+      'user_id': _userId,
       'name': name,
       'time_spent': _totalTimeSpentToday.inSeconds,
     };
@@ -66,9 +67,9 @@ class Task {
     return map;
   }
 
-  Task.fromMap(Map<String, Object> map)
+  Task.fromMap(Map<String, Object?> map)
       : name = map['name'] as String,
-        _userId = map['userid'] as int,
+        _userId = map['user_id'] as int,
         id = map['id'] as int,
         _totalTimeSpentToday = Duration(seconds: map['time_spent'] as int);
 }

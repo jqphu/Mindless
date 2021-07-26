@@ -5,7 +5,7 @@ import 'package:mindless/model/user.dart';
 
 import 'task.dart';
 
-final log = Logger('login');
+final log = Logger('data_repository');
 
 // Create a database per user.
 const kDatabaseName = 'database.db';
@@ -99,34 +99,24 @@ CREATE TABLE IF NOT EXISTS users (
 
     // Must always exit.
     Map user_map = (await db.query(kTableUsers,
-        columns: ['id', 'username', 'name', 'current_task_id', 'started_at'],
+        columns: ['id', 'username', 'name', 'current_task_id'],
         where: 'username = ?',
         whereArgs: [user.username],
         limit: 1))[0];
 
-    var started_at;
     var current_task;
     if (user_map['current_task_id'] != null) {
-      Map task_map = (await db.query(kTableTasks,
+      var task_map = (await db.query(kTableTasks,
           columns: ['id', 'user_id', 'name', 'time_spent'],
           where: 'id = ?',
           whereArgs: [user_map['current_task_id']],
           limit: 1))[0];
 
-      current_task = Task.fromMap(task_map as Map<String, Object>);
+      log.fine('Current task is $task_map');
 
-      started_at = DateTime.fromMillisecondsSinceEpoch(
-          (user_map['started_at'] * 1000).round());
-
-      final now = DateTime.now();
-
-      // Add the time since we last loaded.
-      current_task.addDuration(now.difference(started_at));
+      current_task = Task.fromMap(task_map);
 
       await update(current_task);
-
-      // Update database
-      started_at = now;
     }
 
     var new_user = User(
@@ -147,13 +137,13 @@ CREATE TABLE IF NOT EXISTS users (
 
   /// Get the tasks from the database.
   Future<List<Task>> loadTasks(int id) async {
-    List<Map> maps = await db.query(kTableTasks,
+    var maps = await db.query(kTableTasks,
         columns: ['id', 'user_id', 'name', 'time_spent'],
         where: 'user_id = ?',
         whereArgs: [id]);
 
     return maps
-        .map((Map map) => Task.fromMap(map as Map<String, Object>))
+        .map((Map map) => Task.fromMap(map as Map<String, Object?>))
         .toList();
   }
 
