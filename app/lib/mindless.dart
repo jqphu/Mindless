@@ -64,9 +64,7 @@ class Mindless extends StatelessWidget {
 }
 
 /// Build the app bar with a monkey and a title.
-AppBar buildMonkeyBar(BuildContext context, {@required bool backButton}) {
-  assert(backButton != null);
-
+AppBar buildMonkeyBar(BuildContext context, {required bool backButton}) {
   return AppBar(
     automaticallyImplyLeading: backButton,
     titleSpacing: 0.0,

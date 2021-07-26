@@ -4,18 +4,17 @@ import 'package:mindless/model/instance.dart';
 ///
 /// This task can have multiple instances.
 class Task {
-  Task(this._name, this._userId, [totalTimeSpentToday])
-      : assert(_name != null) {
+  Task(this.name, this._userId, [totalTimeSpentToday]) {
     if (totalTimeSpentToday != null) {
       _totalTimeSpentToday = totalTimeSpentToday;
     }
   }
 
-  int _id;
+  int? id;
   final int _userId;
 
   /// The name of this task.
-  String _name;
+  String name;
 
   /// Total time spent on this application.
   ///
@@ -23,7 +22,7 @@ class Task {
   Duration _totalTimeSpentToday = Duration();
 
   /// List of instances for this task.
-  List<Instance> instances;
+  List<Instance> instances = [];
 
   /// Add some elapsed duration for this task.
   void addDuration(Duration time) {
@@ -31,15 +30,8 @@ class Task {
   }
 
   Duration get totalTimeSpentToday {
-    assert(_totalTimeSpentToday != null);
     return _totalTimeSpentToday;
   }
-
-  set name(String name) => _name = name;
-  String get name => _name;
-
-  set id(int id) => _id = id;
-  int get id => _id;
 
   // Equality determined by name for now.
   @override
@@ -47,36 +39,36 @@ class Task {
     if (object is String) {
       return object.toLowerCase() == name.toLowerCase();
     } else if (object is Task) {
-      return object._name.toLowerCase() == name.toLowerCase();
+      return object.name.toLowerCase() == name.toLowerCase();
     } else {
       throw 'Unknown comparison operator';
     }
   }
 
   @override
-  int get hashCode => _name.hashCode;
+  int get hashCode => name.hashCode;
 
   @override
   String toString() =>
-      '$_name (id=$_id) (userId=$_userId) (totalTime:$_totalTimeSpentToday)';
+      '$name (id=$id) (userId=$_userId) (totalTime:$_totalTimeSpentToday)';
 
   Map<String, Object> toMap() {
     var map = <String, Object>{
-      'user_id': _userId,
-      'name': _name,
+      'userid': _userId,
+      'name': name,
       'time_spent': _totalTimeSpentToday.inSeconds,
     };
 
     if (id != null) {
-      map['id'] = id;
+      map['id'] = id!;
     }
 
     return map;
   }
 
   Task.fromMap(Map<String, Object> map)
-      : _name = map['name'],
-        _userId = map['user_id'],
-        _id = map['id'],
-        _totalTimeSpentToday = Duration(seconds: map['time_spent']);
+      : name = map['name'] as String,
+        _userId = map['userid'] as int,
+        id = map['id'] as int,
+        _totalTimeSpentToday = Duration(seconds: map['time_spent'] as int);
 }

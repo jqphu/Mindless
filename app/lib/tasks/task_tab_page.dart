@@ -36,7 +36,7 @@ class TaskTabPage extends StatelessWidget {
                           );
                         }
 
-                        return null;
+                        return Container();
                       },
                     ),
                   ),
@@ -56,13 +56,13 @@ class TaskTabPage extends StatelessWidget {
                     FloatingActionButtonLocation.endDocked,
                 floatingActionButton: FloatingActionButton(
                   backgroundColor: kColorPrimary,
+                  onPressed: () async {
+                    await Navigator.of(context).pushNamed('/search');
+                  },
                   child: const Icon(
                     Icons.add,
                     color: kColorBrown,
                   ),
-                  onPressed: () async {
-                    await Navigator.of(context).pushNamed('/search');
-                  },
                 )));
       },
     );

@@ -22,7 +22,7 @@ class TaskCurrent extends StatelessWidget {
                 left: 16,
                 right: 8,
               ),
-              child: TaskTextAndTime(task: model.currentTask)),
+              child: TaskTextAndTime(task: model.currentTask!)),
         );
       },
     );
@@ -31,7 +31,7 @@ class TaskCurrent extends StatelessWidget {
 
 class TaskTextAndTime extends StatelessWidget {
   final Task task;
-  TaskTextAndTime({@required this.task}) : assert(task != null);
+  TaskTextAndTime({required this.task});
 
   String _printDuration(Duration duration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');

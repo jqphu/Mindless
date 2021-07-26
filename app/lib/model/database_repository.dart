@@ -14,7 +14,7 @@ const kTableTasks = 'tasks';
 const kTableUsers = 'users';
 
 class TaskDatabase {
-  Database db;
+  late Database db;
 
   /// Initialize Database.
   Future<User> initialize(User user) async {
@@ -57,9 +57,6 @@ CREATE TABLE IF NOT EXISTS users (
 
   -- Current task id. May be NULL.
   current_task_id INTEGER,
-
-  -- Started at time seconds since epoch.
-  started_at INTEGER,
 
   FOREIGN KEY(current_task_id) REFERENCES tasks(id),
 
@@ -116,7 +113,7 @@ CREATE TABLE IF NOT EXISTS users (
           whereArgs: [user_map['current_task_id']],
           limit: 1))[0];
 
-      current_task = Task.fromMap(task_map);
+      current_task = Task.fromMap(task_map as Map<String, Object>);
 
       started_at = DateTime.fromMillisecondsSinceEpoch(
           (user_map['started_at'] * 1000).round());
@@ -132,8 +129,8 @@ CREATE TABLE IF NOT EXISTS users (
       started_at = now;
     }
 
-    var new_user = User(user_map['username'], user_map['name'], user_map['id'],
-        current_task, started_at);
+    var new_user = User(
+        user_map['username'], user_map['name'], user_map['id'], current_task);
 
     await updateUser(new_user);
 
@@ -150,14 +147,14 @@ CREATE TABLE IF NOT EXISTS users (
 
   /// Get the tasks from the database.
   Future<List<Task>> loadTasks(int id) async {
-    assert(db != null);
-
     List<Map> maps = await db.query(kTableTasks,
         columns: ['id', 'user_id', 'name', 'time_spent'],
         where: 'user_id = ?',
         whereArgs: [id]);
 
-    return maps.map((Map map) => Task.fromMap(map)).toList();
+    return maps
+        .map((Map map) => Task.fromMap(map as Map<String, Object>))
+        .toList();
   }
 
   Future<void> update(Task task) async {
@@ -184,7 +181,7 @@ CREATE TABLE IF NOT EXISTS users (
 
   Future<void> saveTasks(List<Task> tasks) async {
     log.fine('Saving all tasks.');
-    await tasks.forEach((task) async {
+    tasks.forEach((task) async {
       await insert(task).catchError((error) {
         log.fine('Failed to add $task with error $error.');
       });

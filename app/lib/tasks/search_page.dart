@@ -12,10 +12,10 @@ class SearchPage extends StatefulWidget {
 }
 
 class _SearchPageState extends State<SearchPage> {
-  SearchBar searchBar;
+  late SearchBar searchBar;
 
   // The optional add task.
-  AddTask addTask;
+  AddTask? addTask;
 
   List<Task> filteredTasks = [];
 
@@ -55,7 +55,7 @@ class _SearchPageState extends State<SearchPage> {
     return [
       SizedBox(height: 10),
       Text('Create Task', textAlign: TextAlign.left),
-      addTask,
+      addTask!,
       Divider(color: Colors.grey, thickness: 2.0),
     ];
   }
@@ -109,7 +109,7 @@ class _SearchPageState extends State<SearchPage> {
 class AddTask extends StatelessWidget {
   final String taskName;
 
-  AddTask({@required this.taskName}) : assert(taskName != null);
+  AddTask({required this.taskName});
 
   @override
   Widget build(BuildContext context) {
@@ -156,7 +156,7 @@ class AddTask extends StatelessWidget {
 class StartTask extends StatelessWidget {
   final Task task;
 
-  StartTask({@required this.task}) : assert(task != null);
+  StartTask({required this.task});
 
   @override
   Widget build(BuildContext context) {

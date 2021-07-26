@@ -30,7 +30,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   final _nameController = TextEditingController();
 
   // Request to register.
-  Future<User> _userRequest;
+  Future<User>? _userRequest;
 
   @override
   void initState() {
@@ -42,7 +42,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
 
   void _resetState() {
     _userRequest = null;
-    _scaffoldKey.currentState.removeCurrentSnackBar();
+    _scaffoldKey.currentState!.removeCurrentSnackBar();
   }
 
   void _handleServerException(exception) {
@@ -51,7 +51,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
     switch (exception.error) {
       case RequestError.AlreadyExists:
         {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
+          _scaffoldKey.currentState!.showSnackBar(SnackBar(
             behavior: SnackBarBehavior.floating,
             content: Text('Someone already snagged this username!'),
             duration: Duration(seconds: 2),
@@ -61,7 +61,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       // Internal server error. Unexpected!
       default:
         {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
+          _scaffoldKey.currentState!.showSnackBar(SnackBar(
             behavior: SnackBarBehavior.floating,
             content: Text(
                 'Server returned an error. Justin probably broke something!'),
@@ -76,7 +76,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   void _handleUnexpectedException(exception) {
     _resetState();
 
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    _scaffoldKey.currentState!.showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
       content:
           Text('Something unexpected went wrong :(. Try again? $exception'),
@@ -87,7 +87,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
   /// Handle a request to register.
   void _handleRegister(String username, String name) {
     // Validate the input
-    if (!_formKey.currentState.validate()) {
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -95,7 +95,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
       _userRequest = User.register(username, name);
     });
 
-    _userRequest
+    _userRequest!
         .then((user) {
           _resetState();
           _usernameController.clear();
@@ -142,14 +142,15 @@ class _RegistrationPageState extends State<RegistrationPage> {
                   _buildRegistrationFormFieldWidget(connecting)
                 ])),
             floatingActionButton: Visibility(
+                visible: !connecting,
                 child: FloatingActionButton(
-                    heroTag: 'register',
-                    child: Icon(Icons.navigate_next, size: 50),
-                    onPressed: () async {
-                      _handleRegister(
-                          _usernameController.text, _nameController.text);
-                    }),
-                visible: !connecting),
+                  heroTag: 'register',
+                  onPressed: () async {
+                    _handleRegister(
+                        _usernameController.text, _nameController.text);
+                  },
+                  child: Icon(Icons.navigate_next, size: 50),
+                )),
           );
         });
   }

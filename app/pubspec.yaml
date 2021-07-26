@@ -18,43 +18,45 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.10.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
 
   # Provider mechanism to notify about data changes.
-  provider: ^4.3.2
+  provider: ^5.0.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.3
+  cupertino_icons: ^1.0.3
 
   # Save login keys :)
-  flutter_secure_storage: ^3.3.5
+  flutter_secure_storage: ^4.2.0
 
-  http: ^0.12.2
+  http: ^0.13.3
 
   # Logging!
-  logging: ^0.11.4
+  logging: ^1.0.1
 
   # Search bar.
-  flutter_search_bar: ^2.1.0
+  flutter_search_bar: ^3.0.0-dev.1
 
+  # Collections (for null safe lists)
+  collection: ^1.15.0-nullsafety.5
 
   # Local sqlite3 data.
-  sqflite: ^1.3.0
+  sqflite: ^2.0.0+3
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   # To create icons
-  flutter_launcher_icons: "^0.7.3"
+  flutter_launcher_icons: ^0.9.1
 
   # Static analyzer!
-  analyzer: "^0.40.4"
+  analyzer: ^1.7.1
 
   # Add stricter warnings
   pedantic: ^1.0.0
@@ -63,6 +65,10 @@ flutter_icons:
   android: "launcher_icon"
   ios: true
   image_path: "assets/monkey.png"
+
+analyzer:
+  enable-experiment:
+    - non-nullable
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

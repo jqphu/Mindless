@@ -7,14 +7,11 @@ import 'dart:convert';
 class User {
   final String username;
   final String name;
-  int id;
+  int? id;
 
-  Task currentTask;
+  Task? currentTask;
 
-  // Current task started at.
-  DateTime startedAt;
-
-  User(this.username, this.name, this.id, this.currentTask, this.startedAt);
+  User(this.username, this.name, this.id, this.currentTask);
 
   Map<String, Object> toMap() {
     var map = <String, Object>{
@@ -23,12 +20,11 @@ class User {
     };
 
     if (id != null) {
-      map['id'] = id;
+      map['id'] = id!;
     }
 
     if (currentTask != null) {
-      map['current_task_id'] = currentTask.id;
-      map['started_at'] = startedAt.millisecondsSinceEpoch / 1000;
+      map['current_task_id'] = currentTask!.id!;
     }
 
     return map;
@@ -42,15 +38,15 @@ class User {
   // Override toString for logging.
   @override
   String toString() {
-    return 'User(id:$id, username:$username, name:$name, currentTask:$currentTask, startedAt:$startedAt)';
+    return 'User(id:$id, username:$username, name:$name, currentTask:$currentTask)';
   }
 
   static Future<User> login(String username) async {
     if (username.contains('test')) {
-      return Future.value(User(username, 'justin', 1, null, null));
+      return Future.value(User(username, 'justin', 1, null));
     }
 
-    var response = await http.post(kUserEndpoint,
+    var response = await http.post(Uri.parse(kUserEndpoint),
         body: jsonEncode({
           'Login': {
             'username': username,
@@ -76,7 +72,7 @@ class User {
   }
 
   static Future<User> register(String username, String name) async {
-    var response = await http.post(kUserEndpoint,
+    var response = await http.post(Uri.parse(kUserEndpoint),
         body: jsonEncode({
           'Create': {'username': username, 'name': name}
         }));

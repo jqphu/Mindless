@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
+import 'package:collection/collection.dart';
 
 import 'dart:async';
 
@@ -14,20 +15,20 @@ class AppStateModel extends ChangeNotifier {
   TaskDatabase database = TaskDatabase();
 
   /// User that is logged in. The user never is cleared.
-  User _user;
+  late User _user;
 
   /// List of tasks.
-  List<Task> _tasks;
+  List<Task> _tasks = [];
 
-  /// Optional Current task.
-  Task _currentTask;
+  /// Current task.
+  Task? _currentTask;
 
   /// Initialize the AppStateModel with the user.
   AppStateModel() {
     reset();
     Timer.periodic(Duration(seconds: 1), (Timer t) async {
       if (_currentTask != null) {
-        _currentTask.addDuration(Duration(seconds: 1));
+        _currentTask!.addDuration(Duration(seconds: 1));
         notifyListeners();
       }
     });
@@ -35,11 +36,10 @@ class AppStateModel extends ChangeNotifier {
 
   String get username => _user.username;
   String get name => _user.name;
-  Task get currentTask => _currentTask;
+  Task? get currentTask => _currentTask;
 
   // Reset AppStateModel
   void reset() {
-    _user = null;
     _tasks = [];
     _currentTask = null;
   }
@@ -59,21 +59,17 @@ class AppStateModel extends ChangeNotifier {
     });
   }
 
-  set currentTask(Task task) {
+  set currentTask(Task? task) {
     log.finer('Starting current task $task current is ${_user.currentTask}');
 
     // Update current task state.
-    final now = DateTime.now();
     if (_currentTask != task && _currentTask != null) {
-      database.update(_currentTask);
+      database.update(_currentTask!);
     }
 
     // Update the user to the new task.
     _user.currentTask = task;
     _currentTask = task;
-
-    // Reset starting task now.
-    _user.startedAt = now;
 
     database.updateUser(_user);
 
@@ -82,7 +78,7 @@ class AppStateModel extends ChangeNotifier {
 
   // Loads the list of available products from the repo.
   void _loadTasks() async {
-    _tasks = await database.loadTasks(_user.id);
+    _tasks = await database.loadTasks(_user.id!);
     notifyListeners();
   }
 
@@ -125,14 +121,14 @@ class AppStateModel extends ChangeNotifier {
   //
   // Returns the new task. This may not add the task if it already exists.
   Future<Task> addTask(String taskName) async {
-    var foundTask = _tasks.singleWhere((Task task) => task.name == taskName,
-        orElse: () => null);
+    Task? foundTask =
+        _tasks.singleWhereOrNull((Task task) => task.name == taskName);
     if (foundTask != null) {
       log.info('Task $foundTask already exists. Returning.');
       return foundTask;
     }
 
-    var result = Task(taskName, _user.id);
+    var result = Task(taskName, _user.id!);
     log.info('Task $result doesn\'t exist. Adding.');
 
     _tasks.add(result);

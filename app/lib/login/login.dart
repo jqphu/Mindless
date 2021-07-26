@@ -22,7 +22,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
-  Future<User> _userRequest;
+  Future<User>? _userRequest;
 
   // Scaffold.
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
   void _resetState() {
     setState(() {
       _userRequest = null;
-      _scaffoldKey.currentState.removeCurrentSnackBar();
+      _scaffoldKey.currentState!.removeCurrentSnackBar();
     });
   }
 
@@ -83,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
       // Internal server error. Unexpected!
       default:
         {
-          _scaffoldKey.currentState.showSnackBar(SnackBar(
+          _scaffoldKey.currentState!.showSnackBar(SnackBar(
             behavior: SnackBarBehavior.floating,
             content: Text(
                 'Server returned an error. Justin probably broke something!'),
@@ -94,15 +94,17 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  void _handleUnexpectedException(exception) {
+  Future<void> _handleUnexpectedException(exception) {
     _resetState();
 
-    _scaffoldKey.currentState.showSnackBar(SnackBar(
+    _scaffoldKey.currentState!.showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
       content:
           Text('Something unexpected went wrong :(. Try again? $exception'),
       duration: Duration(seconds: 2),
     ));
+
+    return Future.error('Unexpected exception');
   }
 
   void _handleLoginAttempt(String username) async {
@@ -115,9 +117,9 @@ class _LoginPageState extends State<LoginPage> {
       _userRequest = User.login(username);
     });
 
-    await _userRequest
+    await _userRequest!
         .then((user) {
-          log.info('Logging in ${user}');
+          log.info('Logging in $user');
 
           // We don't care about updates, i.e. we don't listen to these values.
           Provider.of<AppStateModel>(context, listen: false).user = user;
@@ -160,18 +162,20 @@ class _LoginPageState extends State<LoginPage> {
               _buildLoginFieldWidget(connecting),
             ])),
             floatingActionButton: Visibility(
-                child: FloatingActionButton(
-                    heroTag: 'login',
-                    child: Icon(Icons.navigate_next, size: 50),
-                    onPressed: () async {
-                      // Validate the input
-                      if (!_formKey.currentState.validate()) {
-                        return;
-                      }
+              visible: !connecting,
+              child: FloatingActionButton(
+                heroTag: 'login',
+                onPressed: () async {
+                  // Validate the input
+                  if (!_formKey.currentState!.validate()) {
+                    return;
+                  }
 
-                      _handleLoginAttempt(_usernameController.text);
-                    }),
-                visible: !connecting),
+                  _handleLoginAttempt(_usernameController.text);
+                },
+                child: Icon(Icons.navigate_next, size: 50),
+              ),
+            ),
           );
         });
   }

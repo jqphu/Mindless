@@ -18,7 +18,7 @@ TextFormField buildFormField(
                 : kUnfocusedColor),
       ),
       validator: (value) {
-        if (value.isEmpty) {
+        if (value!.isEmpty) {
           return validateText;
         }
         return null;
