@@ -19,7 +19,7 @@ class TaskDatabase {
   /// Initialize Database.
   Future<User> initialize(User user) async {
     log.info('Initializing database!');
-    //await deleteDatabase(join(await getDatabasesPath(), kDatabaseName));
+    // await deleteDatabase(join(await getDatabasesPath(), kDatabaseName));
     db = await openDatabase(
       join(await getDatabasesPath(), kDatabaseName),
       // When the database is first created, create a table to store dogs.
@@ -75,13 +75,14 @@ CREATE TABLE IF NOT EXISTS users (
   -- Which instance this period belongs to.
   task_id INTEGER NOT NULL,
 
-  -- The time this period started.
-  started_at datetime,
+  -- The time this period started from epoch in milliseoncs.
+  started_at INTEGER,
 
-  -- The time this period completed.
-  ended_at datetime,
+  -- Time spent on this instance.
+  time_spent INTEGER NOT NULL,
 
   FOREIGN KEY(task_id) REFERENCES tasks(id)
+  );
   ''');
       },
       // Set the version. This executes the onCreate function and provides a

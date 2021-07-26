@@ -1,3 +1,5 @@
+import 'package:mindless/model/instance.dart';
+
 /// A Single Task
 ///
 /// This task can have multiple instances.
@@ -19,6 +21,9 @@ class Task {
   ///
   /// This is cumulative of all time.
   Duration _totalTimeSpentToday = Duration();
+
+  /// List of instances for this task.
+  List<Instance> instances;
 
   /// Add some elapsed duration for this task.
   void addDuration(Duration time) {
