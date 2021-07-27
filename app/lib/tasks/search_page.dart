@@ -125,8 +125,7 @@ class AddTask extends StatelessWidget {
         child: InkWell(
             onTap: () async {
               var provider = Provider.of<AppStateModel>(context, listen: false);
-              var task = await provider.addTask(taskName);
-              provider.currentTask = task;
+              await provider.addTask(taskName);
 
               // TODO: Spinning pending wheel :)
 
@@ -174,7 +173,7 @@ class StartTask extends StatelessWidget {
               onTap: () async {
                 var provider =
                     Provider.of<AppStateModel>(context, listen: false);
-                provider.currentTask = task;
+                provider.setCurrentTask(task);
 
                 // TODO: Spinning pending wheel :)
 

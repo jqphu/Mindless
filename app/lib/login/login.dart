@@ -118,11 +118,11 @@ class _LoginPageState extends State<LoginPage> {
     });
 
     await _userRequest!
-        .then((user) {
+        .then((user) async {
           log.info('Logging in $user');
 
           // We don't care about updates, i.e. we don't listen to these values.
-          Provider.of<AppStateModel>(context, listen: false).user = user;
+          Provider.of<AppStateModel>(context, listen: false).loadUser(user);
 
           // Reset everything, we are done with login!
           _finishSuccessfulLogin(username);

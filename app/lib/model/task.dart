@@ -1,15 +1,14 @@
 import 'package:mindless/model/instance.dart';
 import 'package:collection/collection.dart';
+import 'package:logging/logging.dart';
+
+final log = Logger('task');
 
 /// A Single Task
 ///
-/// This task can have multiple instances.
+/// This task can have multiple _instances.
 class Task {
-  Task(this.name, this._userId, [totalTimeSpentToday]) {
-    if (totalTimeSpentToday != null) {
-      _totalTimeSpentToday = totalTimeSpentToday;
-    }
-  }
+  Task(this.name, this._userId);
 
   int? id;
   final int _userId;
@@ -22,12 +21,47 @@ class Task {
   /// This is cumulative of all time.
   Duration _totalTimeSpentToday = Duration();
 
-  /// List of instances for this task.
-  List<Instance> instances = [];
+  /// List of _instances for this task.
+  List<Instance> _instances = [];
+
+  Instance lastInstance() {
+    return _instances.last;
+  }
+
+  /// Start this task.
+  ///
+  /// Assumes nothing is running.
+  Instance start() {
+    assert(_instances.isEmpty || !_instances.last.isActive);
+
+    var startedInstance = Instance(this, DateTime.now(), true);
+    _instances.add(startedInstance);
+
+    return startedInstance;
+  }
+
+  /// End the current task
+  ///
+  /// Assumes something is running.
+  Instance end() {
+    assert(_instances.isNotEmpty && _instances.last.isActive);
+    _instances.last.end();
+    return _instances.last;
+  }
 
   /// Add some elapsed duration for this task.
+  ///
+  /// This only exists as a convenience function (TODO remove, move this to the model itself.)
   void addDuration(Duration time) {
     _totalTimeSpentToday += time;
+  }
+
+  void addInstances(List<Instance> instances) {
+    log.finer('Adding instances $instances');
+    _instances = instances;
+    for (var instance in _instances) {
+      _totalTimeSpentToday += instance.timeSpent;
+    }
   }
 
   Duration get totalTimeSpentToday {
@@ -57,7 +91,6 @@ class Task {
     var map = <String, Object>{
       'user_id': _userId,
       'name': name,
-      'time_spent': _totalTimeSpentToday.inSeconds,
     };
 
     if (id != null) {
@@ -70,6 +103,5 @@ class Task {
   Task.fromMap(Map<String, Object?> map)
       : name = map['name'] as String,
         _userId = map['user_id'] as int,
-        id = map['id'] as int,
-        _totalTimeSpentToday = Duration(seconds: map['time_spent'] as int);
+        id = map['id'] as int;
 }

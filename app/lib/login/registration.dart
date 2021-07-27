@@ -101,7 +101,7 @@ class _RegistrationPageState extends State<RegistrationPage> {
           _usernameController.clear();
           _nameController.clear();
 
-          Provider.of<AppStateModel>(context, listen: false).user = user;
+          Provider.of<AppStateModel>(context, listen: false).loadUser(user);
 
           widget._finishSuccessfulLoginCallback(username);
 

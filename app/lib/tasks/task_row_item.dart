@@ -70,7 +70,7 @@ class _TaskRowItemState extends State<TaskRowItem> {
           onTap: () {
             // Unfocus any editing.
             FocusScope.of(context).unfocus();
-            model.currentTask = widget.task;
+            model.setCurrentTask(widget.task);
           },
           child: Row(children: <Widget>[
             Expanded(

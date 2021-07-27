@@ -2,6 +2,7 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:logging/logging.dart';
 import 'package:mindless/model/user.dart';
+import 'package:mindless/model/instance.dart';
 
 import 'task.dart';
 
@@ -11,13 +12,14 @@ final log = Logger('data_repository');
 const kDatabaseName = 'database.db';
 
 const kTableTasks = 'tasks';
+const kTableInstances = 'instances';
 const kTableUsers = 'users';
 
 class TaskDatabase {
   late Database db;
 
   /// Initialize Database.
-  Future<User> initialize(User user) async {
+  Future<List<Task>> initialize(User user) async {
     log.info('Initializing database!');
     // await deleteDatabase(join(await getDatabasesPath(), kDatabaseName));
     db = await openDatabase(
@@ -34,10 +36,7 @@ CREATE TABLE IF NOT EXISTS tasks (
   -- Name of this task.
   name TEXT NOT NULL,
 
-  -- Time spent on this task in seconds.
-  time_spent INTEGER NOT NULL,
-
-  FOREIGN KEY(user_id) REFERENCES users(id),
+  FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE,
   FOREIGN KEY(parent_id) REFERENCES tasks(id),
 
   -- Ensure the task and username pair is unique.
@@ -78,7 +77,8 @@ CREATE TABLE IF NOT EXISTS users (
   -- Time spent on this instance.
   time_spent INTEGER NOT NULL,
 
-  FOREIGN KEY(task_id) REFERENCES tasks(id)
+  -- DElete all instances if task is deleted
+  FOREIGN KEY(task_id) REFERENCES tasks(id) ON DELETE CASCADE
   );
   ''');
       },
@@ -104,27 +104,20 @@ CREATE TABLE IF NOT EXISTS users (
         whereArgs: [user.username],
         limit: 1))[0];
 
-    var current_task;
-    if (user_map['current_task_id'] != null) {
-      var task_map = (await db.query(kTableTasks,
-          columns: ['id', 'user_id', 'name', 'time_spent'],
-          where: 'id = ?',
-          whereArgs: [user_map['current_task_id']],
-          limit: 1))[0];
+    var userId = user_map['id'];
+    user.id = userId;
 
-      log.fine('Current task is $task_map');
+    var currentTaskId = user_map['current_task_id'];
 
-      current_task = Task.fromMap(task_map);
+    // Load all the tasks and instances.
+    var tasks = await _loadTasks(userId);
 
-      await update(current_task);
+    if (currentTaskId != null) {
+      // Must exist, since there is a currentTaskId.
+      user.currentTask = tasks.firstWhere((task) => task.id == currentTaskId);
     }
 
-    var new_user = User(
-        user_map['username'], user_map['name'], user_map['id'], current_task);
-
-    await updateUser(new_user);
-
-    return new_user;
+    return tasks;
   }
 
   Future<void> updateUser(User user) async {
@@ -136,21 +129,49 @@ CREATE TABLE IF NOT EXISTS users (
   }
 
   /// Get the tasks from the database.
-  Future<List<Task>> loadTasks(int id) async {
+  Future<List<Task>> _loadTasks(int id) async {
+    /// TODO: Make this a inner join...
     var maps = await db.query(kTableTasks,
-        columns: ['id', 'user_id', 'name', 'time_spent'],
+        columns: ['id', 'user_id', 'name'],
         where: 'user_id = ?',
         whereArgs: [id]);
 
-    return maps
+    var tasks = maps
         .map((Map map) => Task.fromMap(map as Map<String, Object?>))
         .toList();
+
+    log.finer('Loaded $tasks');
+
+    for (var task in tasks) {
+      log.finer('Loading $task');
+      var instancesMap = await db.query(kTableInstances,
+          columns: ['id', 'started_at', 'time_spent'],
+          where: 'task_id = ?',
+          whereArgs: [task.id]);
+
+      // Assume it goes from smallest id first.
+      var instances = instancesMap.map((Map<String, Object?> map) {
+        return Instance.fromMap(map, task);
+      }).toList();
+      log.finer('Instances $instances');
+
+      task.addInstances(instances);
+    }
+
+    return tasks;
   }
 
   Future<void> update(Task task) async {
     log.finer('Updating task $task');
     var count = await db.update(kTableTasks, task.toMap(),
         where: 'id = ?', whereArgs: [task.id]);
+    assert(count == 1);
+  }
+
+  Future<void> updateInstance(Instance instance) async {
+    log.fine('Updating instance $instance');
+    var count = await db.update(kTableInstances, instance.toMap(),
+        where: 'id = ?', whereArgs: [instance.id]);
     assert(count == 1);
   }
 
@@ -166,7 +187,13 @@ CREATE TABLE IF NOT EXISTS users (
   Future<Task> insert(Task task) async {
     log.fine('Inserting task $task');
     task.id = await db.insert(kTableTasks, task.toMap());
+    assert(task.id != 0);
     return task;
+  }
+
+  Future<void> insertInstance(Instance instance) async {
+    log.fine('Inserting instance $instance');
+    instance.id = await db.insert(kTableInstances, instance.toMap());
   }
 
   Future<void> saveTasks(List<Task> tasks) async {
