@@ -127,7 +127,7 @@ class _LoginPageState extends State<LoginPage> {
           // Reset everything, we are done with login!
           _finishSuccessfulLogin(username);
 
-          Navigator.of(context).pushNamed('/home', arguments: user);
+          await Navigator.of(context).pushNamed('/home', arguments: user);
         })
         // Catch server errors.
         .catchError(_handleServerException, test: (e) => e is RequestException)

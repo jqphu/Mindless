@@ -130,7 +130,7 @@ class AddTask extends StatelessWidget {
               // TODO: Spinning pending wheel :)
 
               // Created, back to home. Don't care when we finish with home, we are done with this route.
-              await Navigator.of(context).pushReplacementNamed('/home');
+              Navigator.of(context).pop();
             },
 
             // TODO: Style this so it stands out.
@@ -178,7 +178,7 @@ class StartTask extends StatelessWidget {
                 // TODO: Spinning pending wheel :)
 
                 // Created, back to home. Don't care when we finish with home, we are done with this route.
-                await Navigator.of(context).pushReplacementNamed('/home');
+                Navigator.of(context).pop();
               },
 
               // TODO: Style this so it stands out.
